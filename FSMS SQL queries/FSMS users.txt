@@ -1,0 +1,33 @@
+CREATE TABLE UserType(id INTEGER PRIMARY KEY, title VARCHAR(50) UNIQUE NOT NULL);
+CREATE TABLE Department(id INTEGER PRIMARY KEY, title VARCHAR(50) UNIQUE NOT NULL);
+
+CREATE TABLE Users(
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    designation VARCHAR(50) NOT NULL,
+    email VARCHAR(50) UNIQUE NOT NULL,
+    phoneNumber VARCHAR(11) NOT NULL,
+    password VARCHAR(60) NOT NULL,
+    departmentId INTEGER,
+    userTypeId INTEGER,
+    FOREIGN KEY (departmentId) REFERENCES Department(id),
+    FOREIGN KEY (userTypeId) REFERENCES UserType(id)
+);
+
+
+
+
+INSERTIONS
+
+
+INSERT INTO Department VALUES
+    ( 0, 'CS' ),
+    ( 1, 'SE' ),
+    ( 2, 'Cyber' ),
+    ( 3, 'EE' ),
+    ( 4, 'FSM' )
+
+INSERT INTO Usertype VALUES
+    ( 0, 'Simple User' ),
+    ( 1, 'ReportingOfficer' ),
+    ( 2, 'Admin' )

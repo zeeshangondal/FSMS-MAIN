@@ -1,0 +1,21 @@
+CREATE TABLE Requisition(
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    approvedByReportingOfficerDate Date,
+    approvedByStoreKeeperDate Date,
+    completionDate Date,
+    department varchar(50) NOT NULL,
+    departmentId INTEGER NOT NULL,
+    status INTEGER,
+    userId INTEGER NOT NULL, 
+    FOREIGN KEY (departmentId) REFERENCES Department(id),
+    FOREIGN KEY (userId) REFERENCES Users(id)
+);
+
+
+CREATE TABLE RequisitionItems(
+    itemId INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
+    requisitionId INTEGER NOT NULL,
+    FOREIGN KEY (itemId) REFERENCES Items(id),
+    FOREIGN KEY (requisitionId) REFERENCES Requisition(id)    
+)

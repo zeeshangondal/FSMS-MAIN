@@ -1,0 +1,38 @@
+CREATE TABLE Category(
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(70) UNIQUE NOT NULL
+)
+
+CREATE TABLE Packaging(
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(70) UNIQUE NOT NULL
+)
+
+CREATE TABLE Items(
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(60) UNIQUE NOT NULL,
+    quantity INTEGER NOT NULL,
+    packagingId INTEGER NOT NULL,
+    categoryId INTEGER NOT NULL,
+    FOREIGN KEY (packagingId) REFERENCES Packaging(id),
+    FOREIGN KEY (categoryId) REFERENCES Category(id)    
+)
+
+
+
+
+INSERT INTO Category(title) VALUES
+	("Stationary"),
+    ("Utensils"),
+    ("Furniture")
+
+
+INSERT INTO Packaging(title) VALUES
+	("Box"),
+    ("Single")
+
+INSERT INTO Items(name,quantity,packagingId,categoryId) VALUES
+	("Pen",400,1,2),
+    ("Plate",250,1,2)
+    
+
