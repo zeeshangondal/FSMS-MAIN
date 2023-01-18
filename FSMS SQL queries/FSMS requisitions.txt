@@ -30,3 +30,6 @@ CREATE TABLE RequisitionItems(
     FOREIGN KEY (itemId) REFERENCES Items(id),
     FOREIGN KEY (requisitionId) REFERENCES Requisition(id)    
 )
+
+SELECT It.id,It.name,requestedQuantity,issuedQuantity,requisitionId,Cat.title AS category FROM RequisitionItems 
+INNER JOIN Items AS It ON itemId=It.id INNER JOIN Category AS Cat ON It.categoryId=Cat.id WHERE RequisitionId

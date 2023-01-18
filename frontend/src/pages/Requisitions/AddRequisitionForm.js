@@ -81,8 +81,7 @@ export default function AddRequisitionForm(props) {
         } else {
             setValues({
                 ...values,
-                name: loggedInUser.username,
-                designation: loggedInUser.designation,
+                userId:loggedInUser.id,
                 departmentId: loggedInUser.departmentId,
                 email: loggedInUser.email
             })
@@ -144,9 +143,24 @@ export default function AddRequisitionForm(props) {
         })
     }
 
+    const invalid = (msg='Plese fill the form correctly!') => {
+        setNotify({
+            isOpen: true,
+            message: msg,
+            type: 'error'
+        })
+    }
+    const valid = (msg='Submitted Sucessfully') => {
+        setNotify({
+            isOpen: true,
+            message: msg,
+            type: 'success'
+        })
+    }
+
     const addOrEdit = (requisitionData) => {
         if (requisitionData.id === 0) {
-            requisitionService.insertRequisition(requisitionData)
+            requisitionService.insertRequisitionU(requisitionData,valid,invalid)
         }
         else {
             requisitionService.updateRequisition(requisitionData)

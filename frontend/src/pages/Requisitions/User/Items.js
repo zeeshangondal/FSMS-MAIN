@@ -30,8 +30,14 @@ const allItemsHeadCells = [
 export default function Items(props) {
     // const classes = useStyles()
     const classes = styles;
-    const [allItems, setAllItems] = React.useState(itemService.getItems())
+    const [allItems, setAllItems] = React.useState([])
     const [filterFn, setFilterFn] = useState({ fn: items => { return items; } })
+
+
+    React.useEffect(()=>{
+        itemService.getItems(setAllItems)
+    },[0])
+
     const validate = (fieldValues = values) => {
         let temp = { ...errors }
         temp.requestedQuantity = parseInt(fieldValues.requestedQuantity) >= 1 ? "" : "Requested Quantity must b greater than 0."
@@ -80,10 +86,7 @@ export default function Items(props) {
         }
     }
 
-    const [openItemPopup, setOpenItemPopup] = useState(false)
-
-
-    
+    const [openItemPopup, setOpenItemPopup] = useState(false)    
 
     return (
         <>

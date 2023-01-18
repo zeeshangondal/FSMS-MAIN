@@ -36,6 +36,7 @@ export function insertRequisition(data) {
 }
 
 export const insertRequisitionU=async(requisitionData,valid,invalid)=> {
+    console.log("Inserting Requisition: ",requisitionData)
     try {
         const response = await Axios.post(BaseURL + "requisitions",requisitionData );
         if (response.status == 201) {
@@ -106,9 +107,9 @@ export function getAllRequisitionsOfLoggedIn() {
 }
 export const getAllRequisitionsOfLoggedInU=async(setRequisitions)=> {
     const {id,email}=getLoggedInUser();
-    const response = await Axios.get(BaseURL + "requisitions/" + "'loggedInUser'", { params: { id, email } })
+    const response = await Axios.get(BaseURL + "requisitions/" + 'loggedInUser', { params: { id, email } })
     const data=response.data.data
-    console.log(data)
+    console.log("Logged in requisitions: ",data)
     setRequisitions(data)
 }
 
@@ -127,7 +128,13 @@ export function getAllRequisitionsOfDepartment() {
         department: departments[x.departmentId].title
     }))
 }
-
+export const getAllRequisitionsOfDepartmentU=async(setRequisitions)=> {
+    const {id,email,departmentId}=getLoggedInUser();
+    const response = await Axios.get(BaseURL + "requisitions/" + "'department'", { params: { departmentId } })
+    const data=response.data.data
+    console.log(data)
+    setRequisitions(data)
+}
 
 
 export function getAllRequisitionsApprovedByReportingOfficer() {

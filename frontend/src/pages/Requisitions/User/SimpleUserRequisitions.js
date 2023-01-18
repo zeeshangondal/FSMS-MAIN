@@ -39,7 +39,7 @@ const styles = {
 
 export default function Requisitions() {
   const classes = styles;
-  const [records, setRecords] = React.useState(requisitionService.getAllRequisitionsOfLoggedIn())
+  const [records, setRecords] = React.useState([])
   const [filterFn, setFilterFn] = useState({ fn: items => { return items; } })
   const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' })
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', subTitle: '' })
@@ -55,8 +55,8 @@ export default function Requisitions() {
   } = useTable(records, headCells, filterFn)
 
   useEffect(()=>{
-    setRecords(requisitionService.getAllRequisitionsOfLoggedIn())
-  },[])
+    requisitionService.getAllRequisitionsOfLoggedInU(setRecords)
+  },[0])
 
   const getStatusText = (status)=>{
     if(status===0) return 'Pending for approval of Reporting Officer'
@@ -82,7 +82,7 @@ export default function Requisitions() {
       isOpen: false
     })
     requisitionService.deleteRequisition(id)
-    setRecords(requisitionService.getAllRequisitionsOfLoggedIn())
+    requisitionService.getAllRequisitionsOfLoggedInU(setRecords)
     setNotify({
       isOpen: true,
       message: 'Deleted successfully',

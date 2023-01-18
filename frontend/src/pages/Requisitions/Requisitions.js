@@ -16,17 +16,16 @@ export default function Requisitions() {
     getLoggedInUser()
   }, [0])
 
-
+  
   const getUserRequisition = () => {
-    console.log(loggedInUser)
     if (loggedInUser.userType == 'storeKeeper')
       return <StoreKeeperRequisition />
     else
       switch (loggedInUser.userTypeId) {
-        case '0': {
+        case 0: {
           return <SimpleUserRequisition />
         }
-        case '1': {
+        case 1: {
           return <ReportingOfficerRequisition />
         }
 

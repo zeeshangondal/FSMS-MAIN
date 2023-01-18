@@ -7,9 +7,13 @@ const { createCustomAPIError } = require('../errors/CustomAPIError')
 const SQL = {
     getAllRequisitions: "SELECT Req.id,Req.department,Req.departmentId,Req.status,Req.requestedDate,Req.approvedByReportingOfficerDate,Req.approvedByStoreKeeperDate,Req.completionDate,Us.username,Us.email,Us.phoneNumber,Us.designation FROM Requisition AS Req INNER JOIN Users AS Us ON Req.userId=Us.id",
 }
+// itemId INTEGER NOT NULL,
+// requestedQuantity INTEGER NOT NULL,
+// requisitionId INTEGER NOT NULL,
+// issuedQuantity INTEGER NOT NULL,
 
 const getAllRequisitionItems = async (requisition) => {
-    const sql = "SELECT * FROM RequisitionItems WHERE RequisitionId=" + requisition.id
+    const sql = "SELECT It.id,It.name,requestedQuantity,issuedQuantity,requisitionId,Cat.title AS category FROM RequisitionItems INNER JOIN Items AS It ON itemId=It.id INNER JOIN Category AS Cat ON It.categoryId=Cat.id WHERE RequisitionId=" + requisition.id
     const result = await DB.execQuery(sql)
     requisition.items = result
 }
@@ -30,6 +34,7 @@ const getAllRequisitions = asyncWrapper(async (req, res, next) => {
 const getSpecificRequisitions = asyncWrapper(async (req, res, next) => {
     const { id } = req.params
     if (id == "loggedInUser") {
+        console.log("Getting requisitions of logged in user")
         const { id, email } = req.query
         const sql = SQL.getAllRequisitions +" WHERE userId="+id
         result = await DB.execQuery(sql)
@@ -42,33 +47,42 @@ const getSpecificRequisitions = asyncWrapper(async (req, res, next) => {
         }, 1000);
     }
     else if (id == "department") {
-        const { departmentId } = req.query
-        console.log("department: ", departmentId)
-        res.send("NO MATCH")
+        const { departmentId} = req.query
+        const sql = SQL.getAllRequisitions +" WHERE Req.departmentId="+departmentId
+        result = await DB.execQuery(sql)
+        result.forEach((requisition) => {
+            getAllRequisitionItems(requisition)
+        })
+        setTimeout(() => {
+            console.log(result)
+            res.status(200).json({ status: "success", data: result.reverse() })
+        }, 1000);
     }
 //    res.send("DONE")
 })
 
 const insertRequisitionItems = (requisitionId, items) => {
     items.forEach(async (item) => {
-        let { id, requestedQuantity, issuedQuantity } = item
+        let { id, requestedQuantity, issuedQuantity=-1 } = item
         const sql = `INSERT INTO RequisitionItems(itemId ,requestedQuantity ,issuedQuantity ,requisitionId) VALUES(${id},'${requestedQuantity}', ${issuedQuantity}, ${requisitionId})`
         await DB.execQuery(sql)
     });
 }
 
 const createNewRequisition = asyncWrapper(async (req, res, next) => {
-    let { department, departmentId, userId, itemsData } = req.body
+    let { department="TBD", departmentId, userId, items } = req.body
+    
     let sql = `INSERT INTO Requisition(department ,departmentId ,userId )  VALUES('${department}', ${departmentId},${userId} )`
     await DB.execQuery(sql)
     //sleep(100)
     sql = "SELECT * FROM Requisition ORDER BY id DESC LIMIT 1";
     let response = await DB.execQuery(sql)
-    console.log(response)
-    insertRequisitionItems(response[0].id, itemsData.items)
-    const result = { ...response[0], items: itemsData.items }
-    console.log("Result: ", result)
+    //console.log(response)
+    insertRequisitionItems(response[0].id, items)
+    const result = { ...response[0], items }
+    //console.log("Result: ", result)
     res.status(201).json({ status: "success", data: result })
+    //res.status(201).json({ status: "success", data: [] })
 })
 
 const updateItem = asyncWrapper(async (req, res, next) => {
