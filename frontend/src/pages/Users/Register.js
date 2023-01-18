@@ -22,6 +22,14 @@ const initialFValues = {
 export default function Register(props) {
 
     const [notify, setNotify] = React.useState({ isOpen: false, message: '', type: '' })
+    const [departments,setDepartments] = React.useState([])
+
+    const [userTypes,setUserTypes] = React.useState([])
+
+    React.useEffect(function(){
+        employeeService.getDepartmentCollectionU(setDepartments)
+        employeeService.getUserTypesCollectionU(setUserTypes)
+    },[0])
 
 
     const validate = (fieldValues = values) => {
@@ -87,7 +95,7 @@ export default function Register(props) {
     }
 
     const registerUser = async () => {
-        await employeeService.insertEmployee(values,valid,invalid)
+        await employeeService.registerEmployee(values,valid,invalid)
     }
     const handleSubmit = e => {
         e.preventDefault()
@@ -154,7 +162,7 @@ export default function Register(props) {
                             label="Department"
                             value={values.departmentId}
                             onChange={handleInputChange}
-                            options={employeeService.getDepartmentCollection()}
+                            options={departments}
                             error={errors.departmentId}
                         />
                         <Controls.Select
@@ -162,7 +170,7 @@ export default function Register(props) {
                             label="User Type"
                             value={values.userTypeId}
                             onChange={handleInputChange}
-                            options={employeeService.getUserTypes()}
+                            options={userTypes}
                             error={errors.userTypeId}
                         />
 

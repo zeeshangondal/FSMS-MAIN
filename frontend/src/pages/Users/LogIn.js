@@ -17,6 +17,12 @@ const initialFValues = {
 export default function LogIn(props) {
 
     const [notify, setNotify] = React.useState({ isOpen: false, message: '', type: '' })
+    const [userTypes,setUserTypes] = React.useState([])
+
+    React.useEffect(function(){
+        employeeService.getUserTypesCollectionU(setUserTypes)
+    },[0])
+
 
 
     const validate = (fieldValues = values) => {
@@ -92,7 +98,7 @@ export default function LogIn(props) {
                             label="User Type"
                             value={values.userTypeId}
                             onChange={handleInputChange}
-                            options={employeeService.getUserTypes()}
+                            options={userTypes}
                             error={errors.userTypeId}
                         />
                         <Controls.Input

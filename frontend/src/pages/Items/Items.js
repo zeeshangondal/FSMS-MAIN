@@ -64,7 +64,7 @@ export default function Items() {
 
     const classes = styles;
     const [recordForEdit, setRecordForEdit] = useState(null)
-    const [records, setRecords] = useState(itemService.getItems())
+    const [records, setRecords] = useState([])
     const [filterFn, setFilterFn] = useState({
         fn: items => {
             return items;
@@ -75,6 +75,15 @@ export default function Items() {
     const [openAddPopup, setOpenAddPopup] = useState(false)
     const [quantity, setQuantity] = useState(0);
     const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' })
+
+    
+    const getItems=()=>{
+        itemService.getItems(setRecords)
+    }
+    
+    React.useEffect(()=>{
+        getItems()
+    },[0])
 
     const {
         TblContainer,
@@ -107,19 +116,29 @@ export default function Items() {
             }
         })
     }
-
     const addOrEdit = (item, resetForm) => {
         if (item.id === 0)
-            itemService.addItem(item)
+            itemService.addItem(item,valid,invalid)
         else
-            itemService.updateItem(item)
+            itemService.updateItem(item,valid,invalid)
         resetForm()
         setRecordForEdit(null);
         setOpenPopup(false)
-        setRecords([...itemService.getItems()]);
+//        setRecords([...itemService.getItems()]);
+        getItems()
+    }
+
+    const invalid = (msg='Plese fill the form correctly!') => {
         setNotify({
             isOpen: true,
-            message: 'Added Successfully',
+            message: msg,
+            type: 'error'
+        })
+    }
+    const valid = (msg='Submitted Sucessfully') => {
+        setNotify({
+            isOpen: true,
+            message: msg,
             type: 'success'
         })
     }
@@ -131,39 +150,33 @@ export default function Items() {
 
         const onDelete = (quantity) => {
             let difference = recordForEdit.quantity-quantity.quantity
-            if(difference>0) {
+            if(difference>=0) {
                 recordForEdit.quantity -= quantity.quantity;
-                itemService.updateItem(recordForEdit);
-                setRecords([...itemService.getItems()])
-            }else if(difference===0){
-                itemService.deleteItem(recordForEdit);
-                setRecords([...itemService.getItems()])
-            }
-            else{
+                itemService.updateItem(recordForEdit,valid,invalid);
                 setNotify({
                     isOpen: true,
-                    message: 'Quantity can\'t be less then zero',
-                    type: 'error'
+                    message: `Stock of ${quantity.quantity} Removed Successfully`,
+                    type: 'success'
                 })
+            }else {
+                setNotify({
+                isOpen: true,
+                message: 'Insufficient stock of items',
+                type: 'error'
+            })
             }
             setOpenDeletePopup(false);
             setRecordForEdit(null);
-            setNotify({
-                isOpen: true,
-                message: 'Deleted Successfully',
-                type: 'error'
-            })
         }
 
         const onAdd= (quantity)=>{
             recordForEdit.quantity += parseInt(quantity.quantity);
             itemService.updateItem(recordForEdit);
-            setRecords([...itemService.getItems()]);
             setOpenAddPopup(false);
             setRecordForEdit(null);
             setNotify({
                 isOpen: true,
-                message: 'Added Successfully',
+                message: `Stock of ${quantity.quantity} Items Added Successfully`,
             })
         }
 

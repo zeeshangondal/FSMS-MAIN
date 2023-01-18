@@ -1,4 +1,4 @@
-import {React , useEffect} from 'react';
+import {React , useEffect,useState} from 'react';
 import Input from "../../components/controls/Input";
 import {Form, useForm} from "../../components/useForm";
 import Select from "../../components/controls/Select";
@@ -37,6 +37,15 @@ function ItemForm(props) {
     }
 
     const {values,setValues,errors,setErrors,handleInputChange,resetForm} = useForm(initialValues,true,validate);
+    const [categoryOptions,setCategoryOptions] =useState([])
+    const [packagingOptions,setPackagingOptions] =useState([])
+    
+
+    useEffect(()=>{
+        service.getCategoryOptionsU(setCategoryOptions)
+        service.getPackagingOptionsU(setPackagingOptions)
+    },[0])
+
 
     function handleSubmit(e){
         e.preventDefault();
@@ -74,14 +83,14 @@ function ItemForm(props) {
             <Select
                 name="packagingId"
                 label="Packaging"
-                options={service.packagingOptions}
+                options={packagingOptions}
                 value={values.packagingId}
                 onChange={handleInputChange}
                 error={errors.packagingId}/>
             <Select
                 name="categoryId"
                 label="Category"
-                options={service.categoryOptions}
+                options={categoryOptions}
                 value={values.categoryId}
                 onChange={handleInputChange}
                 error={errors.categoryId}/>
