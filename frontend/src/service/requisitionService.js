@@ -1,4 +1,5 @@
 import { getAllEmployees, getAllReportingOfficers, getLoggedInUser } from "./employeeService";
+import Axios from "axios"
 
 const KEYS = {
     requisitions: 'requisitions',
@@ -21,29 +22,33 @@ const initialRequisitionValues = {
     status: 0,
     
 }
+
+
+const BaseURL = "http://localhost:3001/api/v1/"
+
 export const getInitialRequisitionValues = ()=> initialRequisitionValues
 
-// const attachUserDataToRequisition=(requisitionItems)=>{
-//     const user=getLoggedInUser()
-//     const data={
-//         ...initialRequisitionValues,
-//         name:user.username,
-//         requestedDate: new Date(),
-//         departmentId:user.departmentId
-//     }
-//     const requisitionData={
-//         items:requisitionItems.items,
-//         ...data
-//     }
-//     return requisitionData
-//}
-
-export function     insertRequisition(data) {
+export function insertRequisition(data) {
     let requisitions= getAllRequisitions();
     data.id = generateRequisitionId()    
     requisitions.push(data)
     localStorage.setItem(KEYS.requisitions, JSON.stringify(requisitions))
 }
+
+export const insertRequisitionU=async(requisitionData,valid,invalid)=> {
+    try {
+        const response = await Axios.post(BaseURL + "requisitions",requisitionData );
+        if (response.status == 201) {
+            valid("Requisition added successfully")
+        }
+        else
+            invalid(response.data.msg);
+    } catch (e) {
+        console.log(e)
+        invalid("Unexpected Error occured!")
+    }
+}
+
 
 
 export function updateRequisition(data) {
@@ -79,6 +84,12 @@ export function getAllRequisitions() {
     }))
 }
 
+export const getAllRequisitionsU=async(setRequisitions)=> {
+    const response = await Axios.get(BaseURL + "");
+    const data = response.data.data
+    console.log(data)
+    setRequisitions(data)
+}
 
 
 export function getAllRequisitionsOfLoggedIn() {
@@ -93,6 +104,14 @@ export function getAllRequisitionsOfLoggedIn() {
         department: departments[x.departmentId].title
     }))
 }
+export const getAllRequisitionsOfLoggedInU=async(setRequisitions)=> {
+    const {id,email}=getLoggedInUser();
+    const response = await Axios.get(BaseURL + "requisitions/" + "'loggedInUser'", { params: { id, email } })
+    const data=response.data.data
+    console.log(data)
+    setRequisitions(data)
+}
+
 
 
 export function getAllRequisitionsOfDepartment() {

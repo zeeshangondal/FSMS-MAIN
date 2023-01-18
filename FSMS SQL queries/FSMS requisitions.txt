@@ -1,21 +1,32 @@
 CREATE TABLE Requisition(
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    requestedDate Date DEFAULT CURRENT_DATE,
     approvedByReportingOfficerDate Date,
     approvedByStoreKeeperDate Date,
     completionDate Date,
     department varchar(50) NOT NULL,
     departmentId INTEGER NOT NULL,
-    status INTEGER,
+    status INTEGER DEFAULT 0,
     userId INTEGER NOT NULL, 
     FOREIGN KEY (departmentId) REFERENCES Department(id),
     FOREIGN KEY (userId) REFERENCES Users(id)
 );
 
+INSERT INTO Requisition(department ,departmentId ,userId )  VALUES ("SE",1,1)
+
+SELECT Req.id,Req.department,Req.departmentId,Req.status,Req.requestedDate,
+Req.approvedByReportingOfficerDate,Req.approvedByStoreKeeperDate,Req.completionDate,
+Us.username,Us.email,Us.phoneNumber,Us.designation FROM Requisition AS Req INNER JOIN Users AS Us ON Req.userId=Us.id
+
+
+
+
 
 CREATE TABLE RequisitionItems(
     itemId INTEGER NOT NULL,
-    quantity INTEGER NOT NULL,
+    requestedQuantity INTEGER NOT NULL,
     requisitionId INTEGER NOT NULL,
+    issuedQuantity INTEGER NOT NULL,
     FOREIGN KEY (itemId) REFERENCES Items(id),
     FOREIGN KEY (requisitionId) REFERENCES Requisition(id)    
 )

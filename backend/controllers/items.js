@@ -29,7 +29,7 @@ const createNewItem = asyncWrapper(async (req, res, next) => {
     let { name,quantity,packagingId,categoryId } = req.body    
     const sql = `INSERT INTO items(name,quantity,packagingId,categoryId ) VALUES('${name}',${quantity}, ${packagingId}, ${categoryId})`
     await DB.execQuery(sql)
-    sleep(100)
+//    sleep(100)
     sql=SQL.getAllItems+" WHERE It.name="+`'${name}'`;
     result = await DB.execQuery(sql)
     console.log("Result: ",result)

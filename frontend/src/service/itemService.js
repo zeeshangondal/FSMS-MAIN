@@ -1,55 +1,9 @@
 import Axios from "axios"
 
-export let items = [
-    {
-        id:1,
-        name:"pen",
-        categoryId:1,
-        packagingId:1,
-        quantity:10,
-        
-    },
-    {
-        id:2,
-        name:"pencils",
-        categoryId:1,
-        packagingId:1,
-        quantity:1,
-    },
-    {
-        id:3,
-        name:"plates",
-        categoryId:1,
-        packagingId:1,
-        quantity:40,
-    },
-    {
-        id:4,
-        name:"glass",
-        categoryId:0,
-        packagingId:1,
-        quantity:244,
-    },
-    {
-        id:5,
-        name:"chairs",
-        categoryId:1,
-        packagingId:0,
-        quantity:30,
-    }
-]
 
 const BaseURL = "http://localhost:3001/api/v1/"
 
-export const categoryOptions = [
-    {id: 0, title: 'Utensils'},
-    {id: 1, title: 'Stationary'}
-];
 
-export const packagingOptions = [
-    {id:0, title:'box'},
-    {id:1, title:'single'},
-]
 
 export const getCategoryOptionsU = async (setCategoryOptions) => {
     const response = await Axios.get(BaseURL + "itemsCategories");
