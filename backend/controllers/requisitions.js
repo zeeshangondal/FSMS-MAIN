@@ -5,7 +5,7 @@ const { createCustomAPIError } = require('../errors/CustomAPIError')
 
 
 const SQL = {
-    getAllRequisitions: "SELECT Req.id,Req.department,Req.reportingOfficerRemarks ,Req.departmentId,Req.status,Req.requestedDate,Req.approvedByReportingOfficerDate,Req.approvedByStoreKeeperDate,Req.completionDate,Us.username,Us.email,Us.phoneNumber,Us.designation FROM Requisition AS Req INNER JOIN Users AS Us ON Req.userId=Us.id",
+    getAllRequisitions: "SELECT Req.id,Req.reportingOfficerRemarks ,Dep.title AS department, Req.departmentId,Req.status,Req.requestedDate,Req.approvedByReportingOfficerDate,Req.approvedByStoreKeeperDate,Req.completionDate,Us.username,Us.email,Us.phoneNumber,Us.designation FROM Requisition AS Req INNER JOIN Users AS Us ON Req.userId=Us.id INNER JOIN Department AS Dep ON Dep.id=Req.departmentId",
 }
 // itemId INTEGER NOT NULL,
 // requestedQuantity INTEGER NOT NULL,
@@ -58,6 +58,18 @@ const getSpecificRequisitions = asyncWrapper(async (req, res, next) => {
             res.status(200).json({ status: "success", data: result.reverse() })
         }, 1000);
     }
+    else if (id == "approvedByReportingOfficer") {
+        const sql = SQL.getAllRequisitions +" WHERE Req.status=33"
+        result = await DB.execQuery(sql)
+        result.forEach((requisition) => {
+            getAllRequisitionItems(requisition)
+        })
+        setTimeout(() => {
+            //console.log(result)
+            res.status(200).json({ status: "success", data: result.reverse() })
+        }, 1000);
+    }
+    
 //    res.send("DONE")
 })
 

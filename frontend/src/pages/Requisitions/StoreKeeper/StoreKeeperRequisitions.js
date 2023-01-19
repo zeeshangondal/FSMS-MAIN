@@ -41,7 +41,7 @@ const styles = {
 
 export default function Requisitions() {
   const classes = styles;
-  const [records, setRecords] = React.useState(requisitionService.getAllRequisitionsApprovedByReportingOfficer())
+  const [records, setRecords] = React.useState([])
   const [filterFn, setFilterFn] = useState({ fn: items => { return items; } })
   const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' })
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', subTitle: '' })
@@ -57,7 +57,7 @@ export default function Requisitions() {
 
 
   useEffect(()=>{
-    setRecords(requisitionService.getAllRequisitionsApprovedByReportingOfficer())
+    requisitionService.getAllRequisitionsApprovedByReportingOfficerU(setRecords)
   },[])
 
   const handleSearch = e => {
@@ -114,7 +114,7 @@ export default function Requisitions() {
                       <TableCell>{requisitionForm.name}</TableCell>
                       <TableCell>{requisitionForm.requestedDate}</TableCell>
                       <TableCell>{requisitionForm.department}</TableCell>
-                      <TableCell>{requisitionForm.reportingOfficer.username}</TableCell>
+                      <TableCell>{"COMING"}</TableCell>
                       <TableCell>
                         <LinearProgress variant="determinate" value={requisitionForm.status} />
                       </TableCell>

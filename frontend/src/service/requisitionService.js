@@ -129,6 +129,7 @@ export function getAllRequisitionsOfDepartment() {
         department: departments[x.departmentId].title
     }))
 }
+
 export const getAllRequisitionsOfDepartmentU=async(setRequisitions)=> {
     const {id,email,departmentId}=getLoggedInUser();
     const response = await Axios.get(BaseURL + "requisitions/" + "department", { params: { departmentId } })
@@ -169,4 +170,11 @@ export function getAllRequisitionsApprovedByReportingOfficer() {
         }
         return requisition
     })
+}
+
+export const getAllRequisitionsApprovedByReportingOfficerU=async(setRequisitions)=> {
+    const response = await Axios.get(BaseURL + "requisitions/" + "approvedByReportingOfficer")
+    const data=response.data.data
+    console.log(data)
+    setRequisitions(data)
 }
