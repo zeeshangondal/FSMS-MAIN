@@ -1,9 +1,10 @@
 CREATE TABLE Requisition(
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    requestedDate Date DEFAULT CURRENT_DATE,
-    approvedByReportingOfficerDate Date,
-    approvedByStoreKeeperDate Date,
-    completionDate Date,
+    requestedDate DateTime,
+    approvedByReportingOfficerDate DateTime,
+    approvedByStoreKeeperDate DateTime,
+    completionDate DateTime,
+    reportingOfficerRemarks varchar(300) ,
     department varchar(50) NOT NULL,
     departmentId INTEGER NOT NULL,
     status INTEGER DEFAULT 0,
@@ -12,6 +13,7 @@ CREATE TABLE Requisition(
     FOREIGN KEY (userId) REFERENCES Users(id)
 );
 
+UPDATE requisition SET status=0
 INSERT INTO Requisition(department ,departmentId ,userId )  VALUES ("SE",1,1)
 
 SELECT Req.id,Req.department,Req.departmentId,Req.status,Req.requestedDate,

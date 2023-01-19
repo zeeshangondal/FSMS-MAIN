@@ -20,7 +20,8 @@ const initialRequisitionValues = {
     requestedDate: new Date(),
     approvedByReportingOfficerDate:'',
     status: 0,
-    
+    reportingOfficerRemarks:''
+
 }
 
 
@@ -130,12 +131,24 @@ export function getAllRequisitionsOfDepartment() {
 }
 export const getAllRequisitionsOfDepartmentU=async(setRequisitions)=> {
     const {id,email,departmentId}=getLoggedInUser();
-    const response = await Axios.get(BaseURL + "requisitions/" + "'department'", { params: { departmentId } })
+    const response = await Axios.get(BaseURL + "requisitions/" + "department", { params: { departmentId } })
     const data=response.data.data
     console.log(data)
     setRequisitions(data)
 }
-
+export const sendReportingOfficerApproval=async(approvalData,valid,invalid)=>{
+    try {
+        approvalData.query= "reportingOfficerApproval"        
+        const response = await Axios.patch(BaseURL + "requisitions/"+approvalData.id, approvalData);
+        if (response.status == 201) {
+                valid("Requisition Approved Successfully")
+        }
+        else
+                invalid(response.data.msg);
+    } catch (e) {
+        invalid("Requisition cannot be approved for now!");
+    }
+}
 
 export function getAllRequisitionsApprovedByReportingOfficer() {
     if (localStorage.getItem(KEYS.requisitions) == null)

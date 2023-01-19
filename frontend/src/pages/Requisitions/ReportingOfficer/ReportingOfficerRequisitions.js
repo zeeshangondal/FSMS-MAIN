@@ -38,12 +38,15 @@ const styles = {
 
 export default function Requisitions() {
   const classes = styles;
-  const [records, setRecords] = React.useState(requisitionService.getAllRequisitionsOfDepartment())
+  const [records, setRecords] = React.useState([])
   const [filterFn, setFilterFn] = useState({ fn: items => { return items; } })
   const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' })
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', subTitle: '' })
   const navigate = useNavigate()
 
+  React.useEffect(()=>{
+    requisitionService.getAllRequisitionsOfDepartmentU(setRecords)
+  },[0])
   let sr=1;
   const {
     TblContainer,
@@ -64,9 +67,6 @@ export default function Requisitions() {
     })
   }
 
-  useEffect(()=>{
-    setRecords(requisitionService.getAllRequisitionsOfDepartment())
-  },[])
 
   const openInViewRequisitionPage = (requisitionForm) => {
     gotoViewRequisitionPage(requisitionForm)
@@ -107,7 +107,7 @@ export default function Requisitions() {
                   recordsAfterPagingAndSorting().map(requisitionForm => (
                     <StyledTableRow key={requisitionForm.id}>
                       <TableCell>{sr++}</TableCell>
-                      <TableCell>{requisitionForm.name}</TableCell>
+                      <TableCell>{requisitionForm.username}</TableCell>
                       <TableCell>{requisitionForm.requestedDate}</TableCell>
                       
                       <TableCell>

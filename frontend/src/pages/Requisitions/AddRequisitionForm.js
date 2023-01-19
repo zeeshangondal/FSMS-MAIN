@@ -138,7 +138,7 @@ export default function AddRequisitionForm(props) {
 
         setNotify({
             isOpen: true,
-            message: `${item.quantity} ${item.name} Removed Successfully`,
+            message: `${item.quantity || item.requestedQuantity} ${item.name} Removed Successfully`,
             type: 'error'
         })
     }
@@ -196,18 +196,20 @@ export default function AddRequisitionForm(props) {
         })
     }
     const handleApproval = () => {
-        const requisitionData = { ...values, status: 33, approvedByReportingOfficerDate: new Date(), items: addedItems, message: values.message }
-        console.log(requisitionData)
-        addOrEdit(requisitionData)
+        const approvalData = { id:values.id, reportingOfficerRemarks: values.reportingOfficerRemarks }
+        requisitionService.sendReportingOfficerApproval(approvalData,valid,invalid)
         navigate(-1);
     }
 
     const handleInputChange = e => {
         const { name, value } = e.target
+        //console.log("Remarks: ",name,value)
         setValues({
             ...values,
             [name]: value
         })
+        console.log(values)
+
     }
 
     return (
@@ -312,10 +314,10 @@ export default function AddRequisitionForm(props) {
                 <Grid container>
                     <Grid item xs={12}>
                         {isHod ? <Input
-                            placeholder="Message"
-                            name="message"
-                            value={values.message}
-                            onChange={handleInputChange}
+                            placeholder="Reporting Officer Remarks "
+                            name="reportingOfficerRemarks"
+                            value={values.reportingOfficerRemarks }
+                            onChange={handleInputChange }
                             disabled={values.status>=33}
                             multiline
                             fullWidth
@@ -323,7 +325,7 @@ export default function AddRequisitionForm(props) {
                             maxRows={4}
                         /> :
                             <Typography>
-                                {values.message}
+                                {values.reportingOfficerRemarks }
                             </Typography>
                         }
                     </Grid>

@@ -35,7 +35,7 @@ const registerNewUser = asyncWrapper(async (req, res, next) => {
     const sql = `INSERT INTO Users(username,designation,phoneNumber,email,password,departmentId,userTypeId) VALUES('${username}','${designation}', '${phoneNumber}', '${email}', '${password}',${departmentId}, ${userTypeId})`
     try {
         await DB.execQuery(sql)
-        sleep(100)            
+        //sleep(100)            
     }catch(e){
         console.log(e)
         return next(createCustomAPIError("Invalid inputs!. OR User Already exists with given email: " + email,StatusCodes.BAD_REQUEST))

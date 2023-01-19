@@ -5,7 +5,7 @@ const { createCustomAPIError } = require('../errors/CustomAPIError')
 
 
 const SQL = {
-    getAllRequisitions: "SELECT Req.id,Req.department,Req.departmentId,Req.status,Req.requestedDate,Req.approvedByReportingOfficerDate,Req.approvedByStoreKeeperDate,Req.completionDate,Us.username,Us.email,Us.phoneNumber,Us.designation FROM Requisition AS Req INNER JOIN Users AS Us ON Req.userId=Us.id",
+    getAllRequisitions: "SELECT Req.id,Req.department,Req.reportingOfficerRemarks ,Req.departmentId,Req.status,Req.requestedDate,Req.approvedByReportingOfficerDate,Req.approvedByStoreKeeperDate,Req.completionDate,Us.username,Us.email,Us.phoneNumber,Us.designation FROM Requisition AS Req INNER JOIN Users AS Us ON Req.userId=Us.id",
 }
 // itemId INTEGER NOT NULL,
 // requestedQuantity INTEGER NOT NULL,
@@ -26,7 +26,7 @@ const getAllRequisitions = asyncWrapper(async (req, res, next) => {
         getAllRequisitionItems(requisition)
     })
     setTimeout(() => {
-        console.log(result)
+        //console.log(result)
         res.status(200).json({ status: "success", data: result.reverse() })
     }, 1000);
 })
@@ -34,7 +34,6 @@ const getAllRequisitions = asyncWrapper(async (req, res, next) => {
 const getSpecificRequisitions = asyncWrapper(async (req, res, next) => {
     const { id } = req.params
     if (id == "loggedInUser") {
-        console.log("Getting requisitions of logged in user")
         const { id, email } = req.query
         const sql = SQL.getAllRequisitions +" WHERE userId="+id
         result = await DB.execQuery(sql)
@@ -42,19 +41,20 @@ const getSpecificRequisitions = asyncWrapper(async (req, res, next) => {
             getAllRequisitionItems(requisition)
         })
         setTimeout(() => {
-            console.log(result)
+            //console.log(result)
             res.status(200).json({ status: "success", data: result.reverse() })
         }, 1000);
     }
     else if (id == "department") {
         const { departmentId} = req.query
+        //console.log("IN department: ",departmentId)
         const sql = SQL.getAllRequisitions +" WHERE Req.departmentId="+departmentId
         result = await DB.execQuery(sql)
         result.forEach((requisition) => {
             getAllRequisitionItems(requisition)
         })
         setTimeout(() => {
-            console.log(result)
+            //console.log(result)
             res.status(200).json({ status: "success", data: result.reverse() })
         }, 1000);
     }
@@ -72,9 +72,9 @@ const insertRequisitionItems = (requisitionId, items) => {
 const createNewRequisition = asyncWrapper(async (req, res, next) => {
     let { department="TBD", departmentId, userId, items } = req.body
     
-    let sql = `INSERT INTO Requisition(department ,departmentId ,userId )  VALUES('${department}', ${departmentId},${userId} )`
+    let sql = `INSERT INTO Requisition(requestedDate , department ,departmentId ,userId )  VALUES(now(),'${department}', ${departmentId},${userId} )`
     await DB.execQuery(sql)
-    //sleep(100)
+    
     sql = "SELECT * FROM Requisition ORDER BY id DESC LIMIT 1";
     let response = await DB.execQuery(sql)
     //console.log(response)
@@ -85,16 +85,20 @@ const createNewRequisition = asyncWrapper(async (req, res, next) => {
     //res.status(201).json({ status: "success", data: [] })
 })
 
-const updateItem = asyncWrapper(async (req, res, next) => {
-    console.log(req.body)
-    const { id } = req.params
-    const { name, quantity, packagingId, categoryId } = req.body
-    sql = `UPDATE items SET name='${name}', quantity =${quantity}, packagingId='${packagingId}', categoryId=${categoryId} WHERE id=${id}`
-    await DB.execQuery(sql)
 
-    sql = SQL.getAllItems + " WHERE It.id=" + `${id}`;
-    result = await DB.execQuery(sql)
-    res.status(201).json({ status: "success", data: result[0] })
+
+const updateRequisition = asyncWrapper(async (req, res, next) => {
+    console.log("Update Requisition: ", req.body)
+    const { id } = req.params
+    const {query}= req.body
+    if(query== "reportingOfficerApproval"){
+        const {reportingOfficerRemarks} = req.body
+        console.log(reportingOfficerRemarks)
+        const sql = `UPDATE Requisition SET approvedByReportingOfficerDate = now() , status = 33, reportingOfficerRemarks='${reportingOfficerRemarks}'  WHERE id=${id}`
+        await DB.execQuery(sql)
+        console.log("DONE")
+        res.status(201).json({ status: "success", msg:"Rqeuisition updated sucessfully. Given remarks: "+reportingOfficerRemarks})
+    }
 })
 
 
@@ -115,5 +119,5 @@ module.exports = {
     createNewRequisition,
     getSpecificRequisitions,
     deleteItem,
-    updateItem
+    updateRequisition
 }

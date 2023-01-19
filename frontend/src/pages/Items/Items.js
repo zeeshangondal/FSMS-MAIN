@@ -155,7 +155,7 @@ export default function Items() {
                 itemService.updateItem(recordForEdit,valid,invalid);
                 setNotify({
                     isOpen: true,
-                    message: `Stock of ${quantity.quantity} Removed Successfully`,
+                    message: `Stock of ${quantity.quantity} ${recordForEdit.name} Removed Successfully`,
                     type: 'success'
                 })
             }else {
@@ -176,7 +176,7 @@ export default function Items() {
             setRecordForEdit(null);
             setNotify({
                 isOpen: true,
-                message: `Stock of ${quantity.quantity} Items Added Successfully`,
+                message: `Stock of ${quantity.quantity} ${recordForEdit.name} Items Added Successfully`,
             })
         }
 
