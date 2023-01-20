@@ -113,10 +113,31 @@ const updateRequisition = asyncWrapper(async (req, res, next) => {
         setTimeout(async () => {
             const sql = `UPDATE Requisition SET approvedByStoreKeeperDate  = now(), storeKeeperRemarks='${storeKeeperRemarks}' , status = 66  WHERE id=${id}`
             await DB.execQuery(sql)
-            res.status(201).json({ status: "success", msg: "Rqeuisition updated sucessfully" })
+            res.status(201).json({ status: "success", msg: "Requisition updated sucessfully" })
         }, 100)
     }
+    else if (query == "updateRequisition") {
+        console.log(req.body)
+        const { items,id } = req.body
+        await updateRequisitionItems(id,items)
+        res.status(201).json({ status: "success", msg: "Requisition updated sucessfully" })
+    }
 })
+const updateRequisitionItems= async (requisitionId,items) => {
+    let sql = `DELETE FROM RequisitionItems WHERE requisitionId=${requisitionId}`
+    await DB.execQuery(sql)
+    setTimeout(async () => {
+        items.forEach(async (item) => {
+            let { id, requestedQuantity, issuedQuantity = -1 } = item
+            sql = `INSERT INTO RequisitionItems(itemId ,requestedQuantity ,issuedQuantity ,requisitionId) VALUES(${id},'${requestedQuantity}', ${issuedQuantity}, ${requisitionId})`
+            await DB.execQuery(sql)
+        });
+    }, 300)   
+}
+const deleteRequisitionItems= async (requisitionId) => {
+    let sql = `DELETE FROM RequisitionItems WHERE requisitionId=${requisitionId}`
+    await DB.execQuery(sql)   
+}
 const updateRequisitionItemsForIssuedQTA = async (items) => {
     items.forEach(async (item) => {
         const sql = `UPDATE requisitionItems SET issuedQuantity = ${item.issuedQuantity} WHERE itemId=${item.id} AND requisitionId = ${item.requisitionId}`
@@ -125,15 +146,13 @@ const updateRequisitionItemsForIssuedQTA = async (items) => {
 }
 
 
-const deleteItem = asyncWrapper(async (req, res, next) => {
+const deleteRequisition = asyncWrapper(async (req, res, next) => {
     const { id } = req.params
-    result = await DB.execQuery(`SELECT * FROM Items where id=${id}`)
-    if (result.length == 0) {
-        return next(createCustomAPIError("No Item exist with ID: " + id, 404))
-    }
-    sql = `DELETE FROM Items WHERE id=${id}`
+    console.log("Requisition Id: ",id)
+    deleteRequisitionItems(id)
+    const sql = `DELETE FROM Requisition WHERE id=${id}`
     await DB.execQuery(sql)
-    res.status(200).json({ status: "success", data: result[0] })
+    res.status(200).json({ status: "success" , message:"Requisition Deleted Successfully"})
 })
 
 
@@ -141,6 +160,6 @@ module.exports = {
     getAllRequisitions,
     createNewRequisition,
     getSpecificRequisitions,
-    deleteItem,
+    deleteRequisition,
     updateRequisition
 }

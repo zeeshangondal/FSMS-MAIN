@@ -60,11 +60,38 @@ export function updateRequisition(data) {
     localStorage.setItem(KEYS.requisitions, JSON.stringify(requisitions));
 }
 
-export function deleteRequisition(id) {
-    let requisitions= getAllRequisitions();
-    requisitions= requisitions.filter(x => x.id != id)
-    localStorage.setItem(KEYS.requisitions, JSON.stringify(requisitions));
+export const updateRequisitionU=async(updatedData,valid,invalid)=>{
+    try {
+        let requisitionData={id: updatedData.id, items:updatedData.items}
+        requisitionData.query= "updateRequisition"        
+        const response = await Axios.patch(BaseURL + "requisitions/"+requisitionData.id, requisitionData);
+        if (response.status == 201) {
+                valid("Requisition Updated Successfully")
+        }
+        else
+                invalid(response.data.msg);
+    } catch (e) {
+        invalid("Requisition cannot be updated for now!");
+    }
 }
+
+export const deleteRequisitionU=async(requisitionId,valid,invalid,setRecords)=>{
+    try {
+        const response = await Axios.delete(BaseURL + "requisitions/"+requisitionId);
+        if (response.status == 200) {
+                valid("Requisition Deleted Successfully")
+                setRecords(prevRecords=>{
+                    const afterDeletion= prevRecords.filter(req=> req.id != requisitionId)
+                    return afterDeletion
+                })
+        }
+        else
+                invalid(response.data.msg);
+    } catch (e) {
+        invalid("Requisition cannot be deleted for now!");
+    }
+}
+
 
 export function generateRequisitionId() {
     if (localStorage.getItem(KEYS.requisitionId) == null)

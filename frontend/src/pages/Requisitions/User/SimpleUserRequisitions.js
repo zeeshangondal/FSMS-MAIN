@@ -81,14 +81,25 @@ export default function Requisitions() {
       ...confirmDialog,
       isOpen: false
     })
-    requisitionService.deleteRequisition(id)
-    requisitionService.getAllRequisitionsOfLoggedInU(setRecords)
-    setNotify({
-      isOpen: true,
-      message: 'Deleted successfully',
-      type: 'error'
-    })
+    requisitionService.deleteRequisitionU(id,valid,invalid,setRecords)
+    
   }
+
+  
+    const invalid = (msg = 'Invalid!') => {
+        setNotify({
+            isOpen: true,
+            message: msg,
+            type: 'error'
+        })
+    }
+    const valid = (msg = 'Submitted Sucessfully') => {
+        setNotify({
+            isOpen: true,
+            message: msg,
+            type: 'success'
+        })
+    }
 
   const openInAddRequisitionPage = (requisitionForm) => {
     setViewOnly(false)

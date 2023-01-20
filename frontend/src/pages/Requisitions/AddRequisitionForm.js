@@ -45,8 +45,7 @@ export default function AddRequisitionForm(props) {
     ]
     const location = useLocation();
 
-    console.log(location)
-
+    
     const { recordForEdit, viewOnly = false, isHod = true } = location.state;
 
     const classes = styles;
@@ -139,7 +138,7 @@ export default function AddRequisitionForm(props) {
         setNotify({
             isOpen: true,
             message: `${item.quantity || item.requestedQuantity} ${item.name} Removed Successfully`,
-            type: 'error'
+            type: 'success'
         })
     }
 
@@ -163,7 +162,7 @@ export default function AddRequisitionForm(props) {
             requisitionService.insertRequisitionU(requisitionData, valid, invalid)
         }
         else {
-            requisitionService.updateRequisition(requisitionData)
+            requisitionService.updateRequisitionU(requisitionData,valid,invalid)
         }
         setNotify({
             isOpen: true,
@@ -177,8 +176,9 @@ export default function AddRequisitionForm(props) {
         if (validate()) {
             const requisitionData = { ...values, items: addedItems }
             addOrEdit(requisitionData)
+            navigate(-1);
         }
-        navigate(-1);
+        
     }
 
     const resetRequisistionForm = () => {
