@@ -24,7 +24,7 @@ const getAllRequisitions = asyncWrapper(async (req, res, next) => {
     setTimeout(() => {
         //console.log(result)
         res.status(200).json({ status: "success", data: result.reverse() })
-    }, 1000);
+    }, 200);
 })
 
 const getSpecificRequisitions = asyncWrapper(async (req, res, next) => {
@@ -39,7 +39,7 @@ const getSpecificRequisitions = asyncWrapper(async (req, res, next) => {
         setTimeout(() => {
             //console.log(result)
             res.status(200).json({ status: "success", data: result.reverse() })
-        }, 1000);
+        }, 200);
     }
     else if (id == "department") {
         const { departmentId } = req.query
@@ -52,7 +52,7 @@ const getSpecificRequisitions = asyncWrapper(async (req, res, next) => {
         setTimeout(() => {
             //console.log(result)
             res.status(200).json({ status: "success", data: result.reverse() })
-        }, 1000);
+        }, 200);
     }
     else if (id == "approvedByReportingOfficer") {
         const sql = SQL.getAllRequisitions + " WHERE Req.status>=33"
@@ -63,7 +63,7 @@ const getSpecificRequisitions = asyncWrapper(async (req, res, next) => {
         setTimeout(() => {
             //console.log(result)
             res.status(200).json({ status: "success", data: result.reverse() })
-        }, 1000);
+        }, 200);
     }
 
     //    res.send("DONE")
@@ -151,8 +151,10 @@ const deleteRequisition = asyncWrapper(async (req, res, next) => {
     console.log("Requisition Id: ",id)
     deleteRequisitionItems(id)
     const sql = `DELETE FROM Requisition WHERE id=${id}`
-    await DB.execQuery(sql)
-    res.status(200).json({ status: "success" , message:"Requisition Deleted Successfully"})
+    setTimeout(async()=>{
+        await DB.execQuery(sql)
+        res.status(200).json({ status: "success" , message:"Requisition Deleted Successfully"})
+    },300)
 })
 
 

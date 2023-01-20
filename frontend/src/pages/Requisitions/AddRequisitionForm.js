@@ -124,7 +124,7 @@ export default function AddRequisitionForm(props) {
         ])
         setNotify({
             isOpen: true,
-            message: `${item.quantity} ${item.name} Added Successfully`,
+            message: `${item.requestedQuantity} ${item.name} Added Successfully`,
             type: 'success'
         })
     }
