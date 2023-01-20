@@ -311,10 +311,10 @@ export default function AddRequisitionForm(props) {
                 />
                 <Grid container>
                     <Grid item xs={12}>
-                        {isHod ?
+                        {values.status >= 33 || isHod ?
                             <>
-                                <h6>{values.status >= 33 ? "Approved by you on: " + values.approvedByReportingOfficerDate : ""}</h6>
-                                <h6>Your Remarks</h6>
+                                <h6>{values.status >= 33 ? `Approved by ${isHod ? "you" : "Reporting Officer()"} on: ` + values.approvedByReportingOfficerDate : ""}</h6>
+                                <h6>{isHod ? "Your " : "Reporting Officer's "} Remarks</h6>
                                 <Input
                                     placeholder="Reporting Officer Remarks "
                                     name="reportingOfficerRemarks"
@@ -325,16 +325,13 @@ export default function AddRequisitionForm(props) {
                                     fullWidth
                                     rows={2}
                                     maxRows={4}
-                                /></> :
-                            <Typography>
-                                {values.reportingOfficerRemarks}
-                            </Typography>
+                                /></> : ""
                         }
                         {
                             values.status >= 66 ?
                                 <>
-                                    <h6>Approved by Store Keeper on: {values.approvedByStoreKeeperDate}</h6>
-                                    <h6>Stoer Keeper Remarks</h6>
+                                    <h6>{values.status >= 66 ? "Approved by Store Keeper() on: " + values.approvedByStoreKeeperDate : ""}</h6>
+                                    <h6>Store Keeper's Remarks</h6>
                                     <Input
                                         placeholder="Store Keeper Remarks "
                                         name="storeKeeperRemarks"
@@ -344,10 +341,10 @@ export default function AddRequisitionForm(props) {
                                         fullWidth
                                         rows={2}
                                         maxRows={4}
-                                    />
-                                </>
+                                    /></>
                                 : ""
                         }
+
                     </Grid>
                     <Grid item xs={12}>
                         {
