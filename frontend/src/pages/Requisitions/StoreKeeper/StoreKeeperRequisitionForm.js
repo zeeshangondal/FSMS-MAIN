@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { Grid } from '@mui/material';
-import {  Form } from '../../../components/useForm';
+import { Grid, Typography } from '@mui/material';
+import { Form } from '../../../components/useForm';
 import * as requisitionService from "../../../service/requisitionService";
 import useTable from '../../../components/useTable';
-import {  TableBody, TableRow, TableCell,  InputAdornment } from '@mui/material';
+import { TableBody, TableRow, TableCell, InputAdornment } from '@mui/material';
 import Controls from "../../../components/controls/Controls";
-import {  Search } from "@mui/icons-material";
+import { Search } from "@mui/icons-material";
 import Notification from '../../../components/Notification';
 import ConfirmDialog from '../../../components/ConfirmDialog';
-import {useLocation, useNavigate} from "react-router";
+import { useLocation, useNavigate } from "react-router";
+import Input from '../../../components/controls/Input';
 
 
 const styles = {
@@ -37,7 +38,7 @@ export default function StoreKeeperRequisitionForm(props) {
     const classes = styles;
     const location = useLocation();
 
-    const {  recordForEdit } = location.state;
+    const { recordForEdit } = location.state;
 
     // if (!viewOnly) {
     //     addedItemsHeadCells.push({ id: 'actions', label: 'Actions', disableSorting: true })
@@ -61,7 +62,7 @@ export default function StoreKeeperRequisitionForm(props) {
 
 
     const validate = () => {
-        const tbdItems= addedItems.find(item =>item.issuedQuantity ==null)
+        const tbdItems = addedItems.find(item => item.issuedQuantity == -1)
         return tbdItems == null
     }
 
@@ -85,35 +86,38 @@ export default function StoreKeeperRequisitionForm(props) {
             }
         })
     }
+    const invalid = (msg = 'Plese provide valid issued quantities!') => {
+        setNotify({
+            isOpen: true,
+            message: msg,
+            type: 'error'
+        })
+    }
+    const valid = (msg = 'Submitted Sucessfully') => {
+        setNotify({
+            isOpen: true,
+            message: msg,
+            type: 'success'
+        })
+    }
+
     const handleApproval = () => {
         setConfirmDialog({
             ...confirmDialog,
             isOpen: false
         })
-        if(validate()){
-            const requisitionData = { ...values, status: 66, items: addedItems }
-            addOrEdit(requisitionData)
-            navigate(-1);    
-        }else{
+        if (validate()) {
+            const requisitionData = { id: values.id, storeKeeperRemarks:values.storeKeeperRemarks,items: addedItems }
+            requisitionService.sendStoreKeeperApprovalWithIssuedQTA(requisitionData, valid, invalid)
+            navigate(-1);
+        } else {
             setNotify({
                 isOpen: true,
                 message: `All items must have an issued quantity! `,
                 type: 'error'
             })
         }
-        
-    }
 
-    const addOrEdit = (requisitionForm, resetForm) => {
-        if (requisitionForm.id === '0')
-            requisitionService.insertRequisition(requisitionForm)
-        else
-            requisitionService.updateRequisition(requisitionForm)
-        setNotify({
-            isOpen: true,
-            message: 'Approved successfully',
-            type: 'success'
-        })
     }
 
 
@@ -137,6 +141,14 @@ export default function StoreKeeperRequisitionForm(props) {
             item.issuedQuantity = issuedQTA
     }
 
+    const handleInputChange = e => {
+        const { name, value } = e.target
+        //console.log("Remarks: ",name,value)
+        setValues({
+            ...values,
+            [name]: value
+        })
+    }
     return (
         <>
             <Form>
@@ -163,7 +175,7 @@ export default function StoreKeeperRequisitionForm(props) {
                                         <TableCell>{item.category}</TableCell>
                                         <TableCell>{item.requestedQuantity}</TableCell>
                                         <TableCell>
-                                            <input type='number' placeholder={!item.issuedQuantity ? 'TBD' : item.issuedQuantity} style={{ width: '55px', border: 'none' }} disabled={values.status>=40} onChange={(e) => handleItemQuantityChange(e, item)} />
+                                            <input type='number' placeholder={!item.issuedQuantity ? 'TBD' : item.issuedQuantity} style={{ width: '55px', border: 'none' }} disabled={values.status >= 40} onChange={(e) => handleItemQuantityChange(e, item)} />
                                         </TableCell>
 
                                     </TableRow>
@@ -184,24 +196,55 @@ export default function StoreKeeperRequisitionForm(props) {
                 />
                 <Grid container>
                     <Grid item xs={12}>
-                        <Controls.Button
-                            disabled={values.status >=40}
-                            text="Approve"
-                            variant="contained"
-                            onClick={() => {
-                                setConfirmDialog({
-                                    isOpen: true,
-                                    title: 'Are you sure to approve this requisition?',
-                                    subTitle: "You can't undo this operation",
-                                    onConfirm: () => { handleApproval() }
-                                })
-                            }}
-                        />
+                        <h6>{values.status>=66 ? "Approved by you on: "+values.approvedByStoreKeeperDate : ""}</h6> 
+                        <h6>Your Remarks</h6>
+                        <Input
+                            placeholder="Store Keeper Remarks "
+                            name="storeKeeperRemarks"
+                            value={values.storeKeeperRemarks}
+                            onChange={handleInputChange}
+                            disabled={values.status >= 66}
+                            multiline
+                            fullWidth
+                            rows={2}
+                            maxRows={4}
+                        /> 
+                        <h6>Approved by Reporting Officer () on: {values.approvedByReportingOfficerDate} </h6>
+                        <h6> Reporting Officer's Remarks</h6>
+                        <Input
+                            placeholder="Reporting Officer Remarks "
+                            name="reportingOfficerRemarks"
+                            value={values.reportingOfficerRemarks}
+                            disabled={true}
+                            multiline
+                            fullWidth
+                            rows={2}
+                            maxRows={4}
+                        /> 
+                        
+                    </Grid>
+                    <Grid item xs={12}>
+                        {
+                            values.status >= 66 ? "" :
+                                <Controls.Button
+                                    disabled={values.status >= 66}
+                                    text="Approve"
+                                    variant="contained"
+                                    onClick={() => {
+                                        setConfirmDialog({
+                                            isOpen: true,
+                                            title: 'Are you sure to approve this requisition?',
+                                            subTitle: "You can't undo this operation",
+                                            onConfirm: () => { handleApproval() }
+                                        })
+                                    }}
+                                />
+                        }
                         <Controls.Button
                             text="Back"
                             variant="contained"
                             color="default"
-                            onClick={()=>navigate(-1)}
+                            onClick={() => navigate(-1)}
                         />
                     </Grid>
                 </Grid>

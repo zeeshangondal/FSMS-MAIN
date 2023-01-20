@@ -5,6 +5,7 @@ CREATE TABLE Requisition(
     approvedByStoreKeeperDate DateTime,
     completionDate DateTime,
     reportingOfficerRemarks varchar(300) ,
+    storeKeeperRemarks varchar(300) ,
     department varchar(50) NOT NULL,
     departmentId INTEGER NOT NULL,
     status INTEGER DEFAULT 0,

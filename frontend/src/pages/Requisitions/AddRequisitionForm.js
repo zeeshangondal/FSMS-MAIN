@@ -81,7 +81,7 @@ export default function AddRequisitionForm(props) {
         } else {
             setValues({
                 ...values,
-                userId:loggedInUser.id,
+                userId: loggedInUser.id,
                 departmentId: loggedInUser.departmentId,
                 email: loggedInUser.email
             })
@@ -143,14 +143,14 @@ export default function AddRequisitionForm(props) {
         })
     }
 
-    const invalid = (msg='Plese fill the form correctly!') => {
+    const invalid = (msg = 'Plese fill the form correctly!') => {
         setNotify({
             isOpen: true,
             message: msg,
             type: 'error'
         })
     }
-    const valid = (msg='Submitted Sucessfully') => {
+    const valid = (msg = 'Submitted Sucessfully') => {
         setNotify({
             isOpen: true,
             message: msg,
@@ -160,7 +160,7 @@ export default function AddRequisitionForm(props) {
 
     const addOrEdit = (requisitionData) => {
         if (requisitionData.id === 0) {
-            requisitionService.insertRequisitionU(requisitionData,valid,invalid)
+            requisitionService.insertRequisitionU(requisitionData, valid, invalid)
         }
         else {
             requisitionService.updateRequisition(requisitionData)
@@ -196,8 +196,8 @@ export default function AddRequisitionForm(props) {
         })
     }
     const handleApproval = () => {
-        const approvalData = { id:values.id, reportingOfficerRemarks: values.reportingOfficerRemarks }
-        requisitionService.sendReportingOfficerApproval(approvalData,valid,invalid)
+        const approvalData = { id: values.id, reportingOfficerRemarks: values.reportingOfficerRemarks }
+        requisitionService.sendReportingOfficerApproval(approvalData, valid, invalid)
         navigate(-1);
     }
 
@@ -208,8 +208,6 @@ export default function AddRequisitionForm(props) {
             ...values,
             [name]: value
         })
-        console.log(values)
-
     }
 
     return (
@@ -313,26 +311,48 @@ export default function AddRequisitionForm(props) {
                 />
                 <Grid container>
                     <Grid item xs={12}>
-                        {isHod ? <Input
-                            placeholder="Reporting Officer Remarks "
-                            name="reportingOfficerRemarks"
-                            value={values.reportingOfficerRemarks }
-                            onChange={handleInputChange }
-                            disabled={values.status>=33}
-                            multiline
-                            fullWidth
-                            rows={2}
-                            maxRows={4}
-                        /> :
+                        {isHod ?
+                            <>
+                                <h6>{values.status >= 33 ? "Approved by you on: " + values.approvedByReportingOfficerDate : ""}</h6>
+                                <h6>Your Remarks</h6>
+                                <Input
+                                    placeholder="Reporting Officer Remarks "
+                                    name="reportingOfficerRemarks"
+                                    value={values.reportingOfficerRemarks}
+                                    onChange={handleInputChange}
+                                    disabled={values.status >= 33}
+                                    multiline
+                                    fullWidth
+                                    rows={2}
+                                    maxRows={4}
+                                /></> :
                             <Typography>
-                                {values.reportingOfficerRemarks }
+                                {values.reportingOfficerRemarks}
                             </Typography>
+                        }
+                        {
+                            values.status >= 66 ?
+                                <>
+                                    <h6>Approved by Store Keeper on: {values.approvedByStoreKeeperDate}</h6>
+                                    <h6>Stoer Keeper Remarks</h6>
+                                    <Input
+                                        placeholder="Store Keeper Remarks "
+                                        name="storeKeeperRemarks"
+                                        value={values.storeKeeperRemarks}
+                                        disabled={true}
+                                        multiline
+                                        fullWidth
+                                        rows={2}
+                                        maxRows={4}
+                                    />
+                                </>
+                                : ""
                         }
                     </Grid>
                     <Grid item xs={12}>
                         {
                             viewOnly === true ?
-                                values.status >=33 ? '':
+                                values.status >= 33 ? '' :
                                     <Controls.Button
                                         text="Approve"
                                         variant="contained"

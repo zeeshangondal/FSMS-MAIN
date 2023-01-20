@@ -20,8 +20,8 @@ const initialRequisitionValues = {
     requestedDate: new Date(),
     approvedByReportingOfficerDate:'',
     status: 0,
-    reportingOfficerRemarks:''
-
+    reportingOfficerRemarks:'Good to go',
+    storeKeeperRemarks:'Good to go'
 }
 
 
@@ -140,6 +140,20 @@ export const getAllRequisitionsOfDepartmentU=async(setRequisitions)=> {
 export const sendReportingOfficerApproval=async(approvalData,valid,invalid)=>{
     try {
         approvalData.query= "reportingOfficerApproval"        
+        const response = await Axios.patch(BaseURL + "requisitions/"+approvalData.id, approvalData);
+        if (response.status == 201) {
+                valid("Requisition Approved Successfully")
+        }
+        else
+                invalid(response.data.msg);
+    } catch (e) {
+        invalid("Requisition cannot be approved for now!");
+    }
+}
+
+export const sendStoreKeeperApprovalWithIssuedQTA=async(approvalData,valid,invalid)=>{
+    try {
+        approvalData.query= "storeKeeperApproval"        
         const response = await Axios.patch(BaseURL + "requisitions/"+approvalData.id, approvalData);
         if (response.status == 201) {
                 valid("Requisition Approved Successfully")
