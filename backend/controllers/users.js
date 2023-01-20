@@ -5,9 +5,6 @@ const StatusCodes=require("http-status-codes");
 
 
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 const getAllUsers = asyncWrapper(async (req, res, next) => {
     const sql = "SELECT Users.id,username,designation,email,phoneNumber,departmentId, Dep.title AS department, userTypeId, UserT.title AS usertype FROM Users INNER JOIN Department AS Dep ON departmentId=Dep.id  INNER JOIN Usertype AS UserT ON usertypeId=UserT.id"
@@ -32,15 +29,18 @@ const getSingleUser = asyncWrapper(async (req, res, next) => {
 const registerNewUser = asyncWrapper(async (req, res, next) => {
     console.log(req.body)
     let { username, designation, phoneNumber, email, password, departmentId, userTypeId } = req.body
-    const sql = `INSERT INTO Users(username,designation,phoneNumber,email,password,departmentId,userTypeId) VALUES('${username}','${designation}', '${phoneNumber}', '${email}', '${password}',${departmentId}, ${userTypeId})`
+    let sql = `INSERT INTO Users(username,designation,phoneNumber,email,password,departmentId,userTypeId) VALUES('${username}','${designation}', '${phoneNumber}', '${email}', '${password}',${departmentId}, ${userTypeId})`
     try {
         await DB.execQuery(sql)
-        //sleep(100)            
     }catch(e){
-        console.log(e)
         return next(createCustomAPIError("Invalid inputs!. OR User Already exists with given email: " + email,StatusCodes.BAD_REQUEST))
     }
     result = await DB.execQuery(`SELECT Users.id,username,designation,email,phoneNumber,departmentId, Dep.title AS department, userTypeId, UserT.title AS usertype FROM Users INNER JOIN Department AS Dep ON departmentId=Dep.id  INNER JOIN Usertype AS UserT ON usertypeId=UserT.id WHERE email='${email}'`)
+    if(userTypeId==1){
+        //reporting officer
+        sql=`UPDATE Department SET reportingOfficerId=${result[0].id} WHERE id=${departmentId}`
+        await DB.execQuery(sql)
+    }
     res.status(201).json({ status: "success", data: result[0] })
 })
 

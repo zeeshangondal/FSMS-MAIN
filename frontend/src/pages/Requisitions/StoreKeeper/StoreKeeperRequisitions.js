@@ -58,8 +58,9 @@ export default function Requisitions() {
 
   useEffect(()=>{
     requisitionService.getAllRequisitionsApprovedByReportingOfficerU(setRecords)
-  },[])
+  },[0])
 
+  console.log(records)
   const handleSearch = e => {
     let target = e.target;
     setFilterFn({
@@ -111,10 +112,10 @@ export default function Requisitions() {
                   recordsAfterPagingAndSorting().map(requisitionForm => (
                     <StyledTableRow key={requisitionForm.id}>
                       <TableCell>{sr++}</TableCell>
-                      <TableCell>{requisitionForm.name}</TableCell>
+                      <TableCell>{requisitionForm.username}</TableCell>
                       <TableCell>{requisitionForm.requestedDate}</TableCell>
                       <TableCell>{requisitionForm.department}</TableCell>
-                      <TableCell>{"COMING"}</TableCell>
+                      <TableCell>{requisitionForm.reportingOfficer}</TableCell>
                       <TableCell>
                         <LinearProgress variant="determinate" value={requisitionForm.status} />
                       </TableCell>

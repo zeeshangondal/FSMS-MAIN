@@ -101,13 +101,14 @@ export default function StoreKeeperRequisitionForm(props) {
         })
     }
 
+
     const handleApproval = () => {
         setConfirmDialog({
             ...confirmDialog,
             isOpen: false
         })
         if (validate()) {
-            const requisitionData = { id: values.id, storeKeeperRemarks:values.storeKeeperRemarks,items: addedItems }
+            const requisitionData = { id: values.id, storeKeeperRemarks: values.storeKeeperRemarks, items: addedItems }
             requisitionService.sendStoreKeeperApprovalWithIssuedQTA(requisitionData, valid, invalid)
             navigate(-1);
         } else {
@@ -119,6 +120,18 @@ export default function StoreKeeperRequisitionForm(props) {
         }
 
     }
+
+
+    const handleDeliveryApproval = () => {
+        setConfirmDialog({
+            ...confirmDialog,
+            isOpen: false
+        })
+        requisitionService.sendStoreKeeperDeliveryApproval(values.id)
+        navigate(-1);
+
+    }
+
 
 
     const handleItemQuantityChange = (e, item) => {
@@ -152,18 +165,21 @@ export default function StoreKeeperRequisitionForm(props) {
     return (
         <>
             <Form>
-                <div style={classes.toolBar}>
-                    <Controls.Input
-                        style={classes.searchInput}
-                        label="Search"
-                        InputProps={{
-                            startAdornment: (<InputAdornment position="start">
-                                <Search />
-                            </InputAdornment>)
-                        }}
-                        onChange={handleSearch}
-                    />
-                </div>
+                {
+                    values.status < 100 ?
+                        <div style={classes.toolBar}>
+                            <Controls.Input
+                                style={classes.searchInput}
+                                label="Search"
+                                InputProps={{
+                                    startAdornment: (<InputAdornment position="start">
+                                        <Search />
+                                    </InputAdornment>)
+                                }}
+                                onChange={handleSearch}
+                            />
+                        </div> : ""
+                }
                 <TblContainer>
                     <TblHead />
                     <TableBody>
@@ -196,7 +212,19 @@ export default function StoreKeeperRequisitionForm(props) {
                 />
                 <Grid container>
                     <Grid item xs={12}>
-                        <h6>{values.status>=66 ? "Approved by you on: "+values.approvedByStoreKeeperDate : ""}</h6> 
+                        <h6>Approved by Reporting Officer ({values.reportingOfficer}) on: {values.approvedByReportingOfficerDate} </h6>
+                        <h6> Reporting Officer's Remarks</h6>
+                        <Input
+                            placeholder="Reporting Officer Remarks "
+                            name="reportingOfficerRemarks"
+                            value={values.reportingOfficerRemarks}
+                            disabled={true}
+                            multiline
+                            fullWidth
+                            rows={2}
+                            maxRows={4}
+                        />
+                        <h6>{values.status >= 66 ? "Approved by you on: " + values.approvedByStoreKeeperDate : ""}</h6>
                         <h6>Your Remarks</h6>
                         <Input
                             placeholder="Store Keeper Remarks "
@@ -208,23 +236,25 @@ export default function StoreKeeperRequisitionForm(props) {
                             fullWidth
                             rows={2}
                             maxRows={4}
-                        /> 
-                        <h6>Approved by Reporting Officer () on: {values.approvedByReportingOfficerDate} </h6>
-                        <h6> Reporting Officer's Remarks</h6>
-                        <Input
-                            placeholder="Reporting Officer Remarks "
-                            name="reportingOfficerRemarks"
-                            value={values.reportingOfficerRemarks}
-                            disabled={true}
-                            multiline
-                            fullWidth
-                            rows={2}
-                            maxRows={4}
-                        /> 
+                        />
+                        <h4>{values.status == 100 ? `Requisition Completed. Completion Date: ${values.completionDate}` : ""}</h4>
                     </Grid>
                     <Grid item xs={12}>
                         {
-                            values.status >= 66 ? "" :
+                            values.status >= 66 ?
+                                <Controls.Button
+                                    disabled={values.status == 100}
+                                    text="Deliver"
+                                    variant="contained"
+                                    onClick={() => {
+                                        setConfirmDialog({
+                                            isOpen: true,
+                                            title: 'Do you confirm this requisition has been delivered?',
+                                            subTitle: "You can't undo this operation",
+                                            onConfirm: () => { handleDeliveryApproval() }
+                                        })
+                                    }}
+                                /> :
                                 <Controls.Button
                                     disabled={values.status >= 66}
                                     text="Approve"

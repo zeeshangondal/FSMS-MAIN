@@ -45,7 +45,7 @@ export default function AddRequisitionForm(props) {
     ]
     const location = useLocation();
 
-    
+
     const { recordForEdit, viewOnly = false, isHod = true } = location.state;
 
     const classes = styles;
@@ -162,7 +162,7 @@ export default function AddRequisitionForm(props) {
             requisitionService.insertRequisitionU(requisitionData, valid, invalid)
         }
         else {
-            requisitionService.updateRequisitionU(requisitionData,valid,invalid)
+            requisitionService.updateRequisitionU(requisitionData, valid, invalid)
         }
         setNotify({
             isOpen: true,
@@ -178,7 +178,7 @@ export default function AddRequisitionForm(props) {
             addOrEdit(requisitionData)
             navigate(-1);
         }
-        
+
     }
 
     const resetRequisistionForm = () => {
@@ -222,29 +222,34 @@ export default function AddRequisitionForm(props) {
                         addItemToRequisition={addItemToRequisition}
                     />
                 </Popup>
-                <div style={classes.toolBar}>
-                    <Controls.Input
-                        style={classes.searchInput}
-                        label="Search"
-                        InputProps={{
-                            startAdornment: (<InputAdornment position="start">
-                                <Search />
-                            </InputAdornment>)
-                        }}
-                        onChange={handleSearch}
-                    />
-                    {
-                        viewOnly === true ?
-                            ''
-                            :
-                            <Controls.Button
-                                text="Add Items"
-                                variant="outlined"
-                                startIcon={<AddIcon />}
-                                onClick={() => { setOpenPopup(true) }}
+                {
+                    values.status < 100
+                        ?
+                        <div style={classes.toolBar}>
+                            <Controls.Input
+                                style={classes.searchInput}
+                                label="Search"
+                                InputProps={{
+                                    startAdornment: (<InputAdornment position="start">
+                                        <Search />
+                                    </InputAdornment>)
+                                }}
+                                onChange={handleSearch}
                             />
-                    }
-                </div>
+                            {
+                                viewOnly === true ?
+                                    ''
+                                    :
+                                    <Controls.Button
+                                        text="Add Items"
+                                        variant="outlined"
+                                        startIcon={<AddIcon />}
+                                        onClick={() => { setOpenPopup(true) }}
+                                    />
+                            }
+                        </div>
+                        : ""
+                }
                 {addedItems.length === 0 ? <h3 style={{ margin: '2%' }}>No Item added</h3> :
                     <>
                         <TblContainer>
@@ -313,7 +318,7 @@ export default function AddRequisitionForm(props) {
                     <Grid item xs={12}>
                         {values.status >= 33 || isHod ?
                             <>
-                                <h6>{values.status >= 33 ? `Approved by ${isHod ? "you" : "Reporting Officer()"} on: ` + values.approvedByReportingOfficerDate : ""}</h6>
+                                <h6>{values.status >= 33 ? `Approved by ${isHod ? "you" : `Reporting Officer(${values.reportingOfficer})`} on: ` + values.approvedByReportingOfficerDate : ""}</h6>
                                 <h6>{isHod ? "Your " : "Reporting Officer's "} Remarks</h6>
                                 <Input
                                     placeholder="Reporting Officer Remarks "
@@ -330,7 +335,7 @@ export default function AddRequisitionForm(props) {
                         {
                             values.status >= 66 ?
                                 <>
-                                    <h6>{values.status >= 66 ? "Approved by Store Keeper() on: " + values.approvedByStoreKeeperDate : ""}</h6>
+                                    <h6>{values.status >= 66 ? "Approved by Store Keeper on: " + values.approvedByStoreKeeperDate : ""}</h6>
                                     <h6>Store Keeper's Remarks</h6>
                                     <Input
                                         placeholder="Store Keeper Remarks "
@@ -344,6 +349,8 @@ export default function AddRequisitionForm(props) {
                                     /></>
                                 : ""
                         }
+                        <h4>{values.status == 100 ? `Requisition Completed. Completion Date: ${values.completionDate}` : ""}</h4>
+
 
                     </Grid>
                     <Grid item xs={12}>

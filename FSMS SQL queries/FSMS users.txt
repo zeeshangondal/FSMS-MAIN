@@ -1,5 +1,13 @@
 CREATE TABLE UserType(id INTEGER PRIMARY KEY, title VARCHAR(50) UNIQUE NOT NULL);
-CREATE TABLE Department(id INTEGER PRIMARY KEY, title VARCHAR(50) UNIQUE NOT NULL);
+
+
+
+
+CREATE TABLE Department(
+    id INTEGER PRIMARY KEY,
+    title VARCHAR(50) UNIQUE NOT NULL,
+    reportingOfficerId INTEGER UNIQUE
+);
 
 CREATE TABLE Users(
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
@@ -20,7 +28,7 @@ CREATE TABLE Users(
 INSERTIONS
 
 
-INSERT INTO Department VALUES
+INSERT INTO Department(id,title ) VALUES
     ( 0, 'CS' ),
     ( 1, 'SE' ),
     ( 2, 'Cyber' ),
@@ -31,3 +39,4 @@ INSERT INTO Usertype VALUES
     ( 0, 'Simple User' ),
     ( 1, 'ReportingOfficer' ),
     ( 2, 'Admin' )
+
