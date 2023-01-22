@@ -1,5 +1,11 @@
 import React, {useEffect, useState} from 'react'
-import { Paper, TableBody, TableRow, TableCell, Toolbar, InputAdornment, LinearProgress } from '@mui/material';
+import {
+    TableBody,
+    TableCell,
+    InputAdornment,
+    LinearProgress,
+    Typography
+} from '@mui/material';
 import useTable from "../../../components/useTable";
 import * as requisitionService from "../../../service/requisitionService";
 import * as employeeService from "../../../service/employeeService";
@@ -13,7 +19,8 @@ import ConfirmDialog from '../../../components/ConfirmDialog';
 import StyledTableRow from "../../../components/StyledTableRow";
 import HoverPopover from "../../../components/controls/HoverPopover";
 import {useNavigate} from "react-router";
-
+import {useTheme} from "@mui/material/styles";
+import Input from "../../../components/controls/Input";
 
 const headCells = [
   { id: 'sr', label: 'Sr.' },
@@ -27,17 +34,19 @@ const styles = {
     margin: (theme)=> theme.spacing(5),
     padding: (theme)=> theme.spacing(3)
   },
-  searchInput: {
-    width: '75%'
-  },
   toolBar: {
     display: "flex",
     alignItems: "center",
     justifyContent:"space-between",
-  }
+  },
+    searchToggle: {
+        display: 'flex' ,
+        gap: 10,
+        alignItems: "center",
+    }
 }
 
-export default function Requisitions() {
+export default function Requisitions(props) {
   const classes = styles;
   const [records, setRecords] = React.useState([])
   const [filterFn, setFilterFn] = useState({ fn: items => { return items; } })
@@ -45,6 +54,9 @@ export default function Requisitions() {
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', subTitle: '' })
   const [viewOnly,setViewOnly] = useState(false);
   const navigate = useNavigate();
+  const theme = useTheme();
+  const [value, setValue] = React.useState(0);
+
   let sr=1
 
   const {
@@ -55,7 +67,8 @@ export default function Requisitions() {
   } = useTable(records, headCells, filterFn)
 
   useEffect(()=>{
-    requisitionService.getAllRequisitionsOfLoggedInU(setRecords)
+    // requisitionService.getAllRequisitionsOfLoggedInU(setRecords)
+      props.update(setRecords);
   },[0])
 
   const getStatusText = (status)=>{
@@ -82,10 +95,9 @@ export default function Requisitions() {
       isOpen: false
     })
     requisitionService.deleteRequisitionU(id,valid,invalid,setRecords)
-    
+
   }
 
-  
     const invalid = (msg = 'Invalid!') => {
         setNotify({
             isOpen: true,
@@ -106,47 +118,50 @@ export default function Requisitions() {
     gotoAddNewRequisitionPage(requisitionForm,false)
   }
 
-  
   const openInPreviewRequisitionPage = (requisitionForm) => {
     setViewOnly(true)
     gotoAddNewRequisitionPage(requisitionForm,true)
   }
-  const gotoAddNewRequisitionPage = (requisitionForm,viewOnlyStatus) =>{
-    let isHod=false;
-    navigate('/requisition/view',{
-      state: {
-        isHod: isHod,
-        viewOnly: viewOnlyStatus,
-        recordForEdit: requisitionForm,
-      }
-    })
+  const gotoAddNewRequisitionPage = (requisitionForm,viewOnlyStatus) => {
+      let isHod = false;
+      navigate('/requisition/view', {
+          state: {
+              isHod: isHod,
+              viewOnly: viewOnlyStatus,
+              recordForEdit: requisitionForm,
+          }
+      })
   }
 
   return (
     <div>
-      <h2>Simple User</h2>
-      <h4>{employeeService.getLoggedInUser().department } , {employeeService.getLoggedInUser().username}</h4>
-        <>
-          <Paper sx={classes.pageContent}>
-            <div style={classes.toolBar}>
-
-              <Controls.Input
-                sx={classes.searchInput}
-                label="Search"
-                InputProps={{
-                  startAdornment: (<InputAdornment position="start">
-                    <Search />
-                  </InputAdornment>)
-                }}
-                onChange={handleSearch}
-              />
-              <Controls.Button
-                text="Add New"
-                variant="outlined"
-                startIcon={<AddIcon />}
-                onClick={() => { gotoAddNewRequisitionPage();}}
-              />
-            </div>
+      {/*<h2>Simple User</h2>*/}
+      {/*<h4>{employeeService.getLoggedInUser().department } , {employeeService.getLoggedInUser().username}</h4>*/}
+      <>
+          <div style={classes.toolBar}>
+              <Typography variant="h4" noWrap  component="div">
+                  Requisitions
+              </Typography>
+              <div style={classes.searchToggle}>
+                  <Input
+                      placeholder="Search"
+                      size="small"
+                      InputProps={{
+                          startAdornment: (<InputAdornment position="start">
+                              <Search/>
+                          </InputAdornment>)
+                      }}
+                      sx={classes.searchInput}
+                      onChange={handleSearch}
+                  />
+                  <Controls.Button
+                      text="Add New"
+                      variant="outlined"
+                      startIcon={<AddIcon />}
+                      onClick={() => { gotoAddNewRequisitionPage();}}
+                  />
+              </div>
+          </div>
 
             <TblContainer>
               <TblHead />
@@ -192,8 +207,7 @@ export default function Requisitions() {
               </TableBody>
             </TblContainer>
             <TblPagination />
-          </Paper>
-        </>
+      </>
       <Notification
         notify={notify}
         setNotify={setNotify}

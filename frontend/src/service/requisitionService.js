@@ -74,8 +74,6 @@ export const deleteRequisitionU=async(requisitionId,valid,invalid,setRecords)=>{
 
 
 
-
-
 export const getAllRequisitionsU=async(setRequisitions)=> {
     const response = await Axios.get(BaseURL + "");
     const data = response.data.data
@@ -83,6 +81,22 @@ export const getAllRequisitionsU=async(setRequisitions)=> {
     setRequisitions(data)
 }
 
+export const getAllCompletedRequisitionsU=async(setRequisitions)=>{
+    console.log('hello')
+    setRequisitions(
+        (await getAllRequisitionsOfLoggedInU(setRequisitions)).filter(
+            requisition => requisition.status===100
+        )
+    )
+}
+
+export const getAllUnCompletedRequisitionsU=async(setRequisitions)=>{
+    setRequisitions(
+        (await getAllRequisitionsOfLoggedInU(setRequisitions)).filter(
+            requisition => requisition.status<100
+        )
+    )
+}
 
 export const getAllRequisitionsOfLoggedInU=async(setRequisitions)=> {
     const {id,email}=getLoggedInUser();
@@ -90,9 +104,25 @@ export const getAllRequisitionsOfLoggedInU=async(setRequisitions)=> {
     const data=response.data.data
     console.log("Logged in requisitions: ",data)
     setRequisitions(data)
+    return data;
 }
 
+export const getAllCompletedRequisitionsD=async(setRequisitions)=>{
+    console.log('hello')
+    setRequisitions(
+        (await getAllRequisitionsOfDepartmentU(setRequisitions)).filter(
+            requisition => requisition.status>=33
+        )
+    )
+}
 
+export const getAllUnCompletedRequisitionsD=async(setRequisitions)=>{
+    setRequisitions(
+        (await getAllRequisitionsOfDepartmentU(setRequisitions)).filter(
+            requisition => requisition.status<33
+        )
+    )
+}
 
 export const getAllRequisitionsOfDepartmentU=async(setRequisitions)=> {
     const {id,email,departmentId}=getLoggedInUser();
@@ -100,6 +130,7 @@ export const getAllRequisitionsOfDepartmentU=async(setRequisitions)=> {
     const data=response.data.data
     console.log(data)
     setRequisitions(data)
+    return data;
 }
 export const sendReportingOfficerApproval=async(approvalData,valid,invalid)=>{
     try {

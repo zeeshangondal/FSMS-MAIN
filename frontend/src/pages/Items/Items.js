@@ -37,8 +37,6 @@ const styles = {
         margin: (theme)=> theme.spacing(5),
         padding: (theme)=> theme.spacing(3)
     },
-    searchInput: {
-    },
     toolBar: {
         display: "flex",
         alignItems: "center",

@@ -1,5 +1,14 @@
 import React, {useEffect, useState} from 'react'
-import { Paper, TableBody, TableRow, TableCell, Toolbar, InputAdornment, LinearProgress } from '@mui/material';
+import {
+  Paper,
+  TableBody,
+  TableRow,
+  TableCell,
+  Toolbar,
+  InputAdornment,
+  LinearProgress,
+  Typography
+} from '@mui/material';
 import useTable from "../../../components/useTable";
 import * as requisitionService from "../../../service/requisitionService";
 import * as employeeService from "../../../service/employeeService";
@@ -10,6 +19,8 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import StyledTableRow from "../../../components/StyledTableRow";
 import {useNavigate} from "react-router";
 import {Search} from "@mui/icons-material";
+import Input from "../../../components/controls/Input";
+import AddIcon from "@mui/icons-material/Add";
 
 
 const headCells = [
@@ -23,20 +34,21 @@ const headCells = [
 
 const styles = {
   pageContent: {
-    margin: (theme) => theme.spacing(5),
-    padding: (theme) => theme.spacing(3)
-  },
-  searchInput: {
-    width: '75%'
+    margin: (theme)=> theme.spacing(5),
+    padding: (theme)=> theme.spacing(3)
   },
   toolBar: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent:"space-between",
+  },
+  searchToggle: {
+    display: 'flex' ,
+    gap: 10,
+    alignItems: "center",
   }
 }
-
-export default function Requisitions() {
+export default function Requisitions(props) {
   const classes = styles;
   const [records, setRecords] = React.useState([])
   const [filterFn, setFilterFn] = useState({ fn: items => { return items; } })
@@ -45,7 +57,8 @@ export default function Requisitions() {
   const navigate = useNavigate()
 
   React.useEffect(()=>{
-    requisitionService.getAllRequisitionsOfDepartmentU(setRecords)
+    // requisitionService.getAllRequisitionsOfDepartmentU(setRecords)
+    props.update(setRecords);
   },[0])
   let sr=1;
   const {
@@ -62,7 +75,7 @@ export default function Requisitions() {
         if (target.value === "")
           return items;
         else
-          return items.filter(x => x.fullName.toLowerCase().includes(target.value))
+          return items.filter(x => x.username.toLowerCase().includes(target.value))
       }
     })
   }
@@ -82,23 +95,27 @@ export default function Requisitions() {
   }
   return (
     <div>
-      <h2>Reporting Officer</h2>
-      <h4>{employeeService.getLoggedInUser().department } , {employeeService.getLoggedInUser().username}</h4>
+      {/*<h2>Reporting Officer</h2>*/}
+      {/*<h4>{employeeService.getLoggedInUser().department } , {employeeService.getLoggedInUser().username}</h4>*/}
         <>
-
-          <Paper sx={classes.pageContent}>
-            <Toolbar>
-              <Controls.Input
-                sx={classes.searchInput}
-                label="Search"
-                InputProps={{
-                  startAdornment: (<InputAdornment position="start">
-                    <Search />
-                  </InputAdornment>)
-                }}
-                onChange={handleSearch}
+          <div style={classes.toolBar}>
+            <Typography variant="h4" noWrap  component="div">
+              Requisitions
+            </Typography>
+            <div style={classes.searchToggle}>
+              <Input
+                  placeholder="Search"
+                  size="small"
+                  InputProps={{
+                    startAdornment: (<InputAdornment position="start">
+                      <Search/>
+                    </InputAdornment>)
+                  }}
+                  sx={classes.searchInput}
+                  onChange={handleSearch}
               />
-            </Toolbar>
+            </div>
+          </div>
 
             <TblContainer>
               <TblHead />
@@ -125,7 +142,6 @@ export default function Requisitions() {
               </TableBody>
             </TblContainer>
             <TblPagination />
-          </Paper>
         </>
       <Notification
         notify={notify}

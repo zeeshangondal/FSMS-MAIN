@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react'
-import { Grid, Typography } from '@mui/material';
-import { Form } from '../../components/useForm';
+import React, {useState} from 'react'
+import {Autocomplete, Grid, InputAdornment, TableBody, TableCell, TableRow} from '@mui/material';
+import {Form} from '../../components/useForm';
 import * as requisitionService from "../../service/requisitionService";
 import * as employeeService from "../../service/employeeService";
 import useTable from '../../components/useTable';
-import { Paper, TableBody, TableRow, TableCell, Toolbar, InputAdornment } from '@mui/material';
 import Controls from "../../components/controls/Controls";
-import { Search } from "@mui/icons-material";
+import {Search} from "@mui/icons-material";
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import Items from './User/Items';
@@ -14,10 +13,12 @@ import Notification from '../../components/Notification';
 import Popup from '../../components/Popup';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import ActionButton from "../../components/controls/ActionButton";
-import { useLocation, useNavigate } from "react-router";
+import {useLocation, useNavigate} from "react-router";
 import TextField from "@mui/material/TextField";
 import Input from "../../components/controls/Input";
-
+import * as itemService from "../../service/itemService";
+import SaveIcon from '@mui/icons-material/Save';
+import {getCategoryOptionsU, getItems, getPackagingOptionsU} from "../../service/itemService";
 
 
 const styles = {
@@ -39,34 +40,45 @@ const styles = {
 export default function AddRequisitionForm(props) {
 
     const addedItemsHeadCells = [
-        { id: 'name', label: 'Name' },
-        { id: 'category', label: 'Category' },
-        { id: 'requestedQuantity', label: 'Requested Quantity', disableSorting: true },
+        {id: 'name', label: 'Name'},
+        {id: 'quantity', label: 'Quantity'},
+        {id: 'category', label: 'Category'},
+        {id: 'requestedQuantity', label: 'Requested Quantity', disableSorting: true},
     ]
     const location = useLocation();
 
 
-    const { recordForEdit, viewOnly = false, isHod = true } = location.state;
+    const {recordForEdit, viewOnly = false, isHod = true} = location.state;
 
     const classes = styles;
 
     if (!viewOnly) {
-        addedItemsHeadCells.push({ id: 'actions', label: 'Actions', disableSorting: true })
+        addedItemsHeadCells.push({id: 'actions', label: 'Actions', disableSorting: true})
     }
     const [values, setValues] = React.useState(requisitionService.getInitialRequisitionValues())
 
     if (values.status >= 66) {
-        addedItemsHeadCells.push({ id: 'issuedQuantity', label: 'Issued Quantity', disableSorting: true })
+        addedItemsHeadCells.push({id: 'issuedQuantity', label: 'Issued Quantity', disableSorting: true})
     }
 
 
     const loggedInUser = employeeService.getLoggedInUser();
 
     const [addedItems, setAddedItems] = React.useState([])
-    const [filterFn, setFilterFn] = useState({ fn: items => { return items; } })
-    const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' })
+    const [filterFn, setFilterFn] = useState({
+        fn: items => {
+            return items;
+        }
+    })
+    const [notify, setNotify] = useState({isOpen: false, message: '', type: ''})
     const [openPopup, setOpenPopup] = useState(false)
-    const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', subTitle: '' })
+    const [confirmDialog, setConfirmDialog] = useState({isOpen: false, title: '', subTitle: ''})
+    const [items,setItems] = useState([]);
+    const [categoryOptions, setCategoryOptions] = useState([]);
+    const [packagingOptions, setPackagingOptions] = useState([]);
+    const [currentItems, setcurrentItems] = useState([]);
+    const [added,setAdded] = useState(true);
+    const [selectedValue, setSelectedValue] = useState('');
     const navigate = useNavigate();
 
     React.useEffect(() => {
@@ -86,6 +98,12 @@ export default function AddRequisitionForm(props) {
             })
         }
     }, [recordForEdit])
+
+    React.useEffect( () => {
+        getItems(setItems);
+        getPackagingOptionsU(setPackagingOptions);
+        getCategoryOptionsU(setCategoryOptions);
+    },[0])
 
 
     const validate = () => {
@@ -128,6 +146,12 @@ export default function AddRequisitionForm(props) {
             type: 'success'
         })
     }
+
+    const onRemoveCurrentItem = () => {
+        setcurrentItems([])
+        setAdded(true);
+    }
+
     const onRemoveItemFromRequisition = item => {
         setConfirmDialog({
             ...confirmDialog,
@@ -160,8 +184,7 @@ export default function AddRequisitionForm(props) {
     const addOrEdit = (requisitionData) => {
         if (requisitionData.id === 0) {
             requisitionService.insertRequisitionU(requisitionData, valid, invalid)
-        }
-        else {
+        } else {
             requisitionService.updateRequisitionU(requisitionData, valid, invalid)
         }
         setNotify({
@@ -174,7 +197,7 @@ export default function AddRequisitionForm(props) {
     const handleSubmit = (e) => {
         e.preventDefault()
         if (validate()) {
-            const requisitionData = { ...values, items: addedItems }
+            const requisitionData = {...values, items: addedItems}
             addOrEdit(requisitionData)
             navigate(-1);
         }
@@ -196,18 +219,50 @@ export default function AddRequisitionForm(props) {
         })
     }
     const handleApproval = () => {
-        const approvalData = { id: values.id, reportingOfficerRemarks: values.reportingOfficerRemarks }
+        const approvalData = {id: values.id, reportingOfficerRemarks: values.reportingOfficerRemarks}
         requisitionService.sendReportingOfficerApproval(approvalData, valid, invalid)
         navigate(-1);
     }
 
     const handleInputChange = e => {
-        const { name, value } = e.target
+        const {name, value} = e.target
         //console.log("Remarks: ",name,value)
         setValues({
             ...values,
             [name]: value
         })
+    }
+
+    const handleItemQuantityChange = (e, item) => {
+        const reqQTA = e.target.value
+        if (reqQTA < 0) {
+            setNotify({
+                isOpen: true,
+                message: `Issued items cannot be a negative number `,
+                type: 'error'
+            })
+        }
+            else if (reqQTA > currentItems[0].quantity) {
+                setNotify({
+                    isOpen: true,
+                    message: `Issued items cannot be a more than requested items `,
+                    type: 'error'
+                })
+        }
+        else
+            currentItems[0].requestedQuantity = reqQTA
+    }
+
+
+    const handlecurrentItemsChange = e => {
+        setcurrentItems([items.filter(item=>item.name===e)[0]]);
+    }
+
+    const addEditableRow = () => {
+        console.log(items[0]);
+        setcurrentItems([...currentItems,items[0]]);
+        console.log(currentItems);
+        setAdded(false);
     }
 
     return (
@@ -231,7 +286,7 @@ export default function AddRequisitionForm(props) {
                                 label="Search"
                                 InputProps={{
                                     startAdornment: (<InputAdornment position="start">
-                                        <Search />
+                                        <Search/>
                                     </InputAdornment>)
                                 }}
                                 onChange={handleSearch}
@@ -243,23 +298,28 @@ export default function AddRequisitionForm(props) {
                                     <Controls.Button
                                         text="Add Items"
                                         variant="outlined"
-                                        startIcon={<AddIcon />}
-                                        onClick={() => { setOpenPopup(true) }}
+                                        disabled={!added}
+                                        startIcon={<AddIcon/>}
+                                        onClick={() => {
+                                            // setOpenPopup(true)
+                                            addEditableRow();
+                                        }}
                                     />
                             }
                         </div>
                         : ""
                 }
-                {addedItems.length === 0 ? <h3 style={{ margin: '2%' }}>No Item added</h3> :
+                {addedItems.length === 0 && currentItems.length === 0 ? <h3 style={{margin: '2%'}}>No Item added</h3> :
                     <>
                         <TblContainer>
-                            <TblHead />
+                            <TblHead/>
                             <TableBody>
                                 {
-                                    recordsAfterPagingAndSorting().map((item) => {
+                                    recordsAfterPagingAndSorting().map( (item) => {
                                         return (
                                             <TableRow key={item.id}>
                                                 <TableCell>{item.name}</TableCell>
+                                                <TableCell>{item.quantity}</TableCell>
                                                 <TableCell>{item.category}</TableCell>
                                                 <TableCell>{item.requestedQuantity}</TableCell>
                                                 {
@@ -282,15 +342,15 @@ export default function AddRequisitionForm(props) {
                                                                 </ActionButton>
 
                                                                 <Controls.ActionButton color='secondary'
-                                                                    onClick={() => {
-                                                                        console.log("clicked")
-                                                                        setConfirmDialog({
-                                                                            isOpen: true,
-                                                                            title: 'Are you sure to delete this item?',
-                                                                            subTitle: "You can't undo this operation",
-                                                                            onConfirm: () => { onRemoveItemFromRequisition(item) }
-                                                                        })
-                                                                    }}
+                                                                                       onClick={() => {
+                                                                                           console.log("clicked")
+                                                                                           setConfirmDialog({
+                                                                                               isOpen: true,
+                                                                                               title: 'Are you sure to delete this item?',
+                                                                                               subTitle: "You can't undo this operation",
+                                                                                               onConfirm: () => { onRemoveItemFromRequisition(item) }
+                                                                                           })
+                                                                                       }}
                                                                 >
                                                                     <CloseIcon />
                                                                 </Controls.ActionButton>
@@ -301,9 +361,70 @@ export default function AddRequisitionForm(props) {
                                         )
                                     })
                                 }
+                                {
+                                    currentItems.map(item=>{
+                                        return (
+                                            <TableRow key={item.id}>
+                                                {/*<TableCell>{item.name}</TableCell>*/}
+                                                <TableCell>
+                                                    <Autocomplete
+                                                        disablePortal
+                                                        value={selectedValue}
+                                                        options={items.map(item=>item.name)}
+                                                        sx={{width: 300}}
+                                                        onChange={(event, newValue) => {
+                                                            setSelectedValue(newValue);
+                                                            handlecurrentItemsChange(newValue);
+                                                        }}
+                                                        renderInput={(params) => <TextField {...params} label="Name"/>}
+                                                    />
+                                                </TableCell>
+                                                <TableCell>
+                                                    {item.quantity}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {item.category}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Input type='number' style={{ width: '55px', border: 'none' }} onChange={(e) => handleItemQuantityChange(e)} />
+                                                </TableCell>
+                                                {
+                                                    values.status >= 66 ?
+                                                        <>
+                                                            <TableCell>{item.issuedQuantity}</TableCell>
+                                                        </>
+                                                        : ''
+                                                }
+                                                {
+                                                    viewOnly === true ? ''
+                                                        :
+                                                        <>
+                                                            <TableCell>
+                                                                <ActionButton
+                                                                    color="success"
+                                                                    onClick={() => {
+                                                                        setAddedItems([...addedItems,item])
+                                                                        setcurrentItems([]);
+                                                                        setAdded(true);
+                                                                    }}>
+                                                                    <SaveIcon/>
+                                                                </ActionButton>
+
+                                                                <Controls.ActionButton color='secondary'
+                                                                                       onClick={onRemoveCurrentItem}
+                                                                >
+                                                                    <CloseIcon/>
+                                                                </Controls.ActionButton>
+                                                            </TableCell>
+                                                        </>
+                                                }
+                                            </TableRow>
+                                        )
+                                    })
+                                }
                             </TableBody>
                         </TblContainer>
-                        <TblPagination />
+                        <TblPagination/>
                     </>
                 }
                 <Notification
@@ -360,7 +481,7 @@ export default function AddRequisitionForm(props) {
                                     <Controls.Button
                                         text="Approve"
                                         variant="contained"
-                                        sx={{ display: isHod ? 'inline' : 'none' }}
+                                        sx={{display: isHod ? 'inline' : 'none'}}
                                         onClick={handleApproval}
                                     />
                                 :

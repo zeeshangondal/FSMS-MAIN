@@ -96,9 +96,16 @@ export const deleteItem=async(itemData,valid,invalid)=>{
 export const getItems=async(setItems)=>{
     const response = await Axios.get(BaseURL + "items");
     const data = response.data.data
-    console.log(data)
     setItems(data)
 }
+
+export const getItemsOnly=async()=>{
+    const response = await Axios.get(BaseURL + "items");
+    const data = response.data.data
+    console.log(data)
+    return data;
+}
+
 
 
 

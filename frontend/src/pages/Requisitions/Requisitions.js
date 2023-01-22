@@ -4,6 +4,9 @@ import SimpleUserRequisition from './User/SimpleUserRequisitions'
 import ReportingOfficerRequisition from './ReportingOfficer/ReportingOfficerRequisitions'
 
 import StoreKeeperRequisition from './StoreKeeper/StoreKeeperRequisitions'
+import RequisitionTabs from "./User/SimpleUserRequisitionTabs";
+import SimpleUserRequisitionTabs from "./User/SimpleUserRequisitionTabs";
+import ReportingOfficerRequisitionTabs from "./ReportingOfficer/ReportingOfficerRequisitionTabs";
 
 export default function Requisitions() {
   const [loggedInUser, setLoggedInUser] = React.useState({})
@@ -18,15 +21,15 @@ export default function Requisitions() {
 
   
   const getUserRequisition = () => {
-    if (loggedInUser.userType == 'storeKeeper')
+    if (loggedInUser.userType === 'storeKeeper')
       return <StoreKeeperRequisition />
     else
       switch (loggedInUser.userTypeId) {
         case 0: {
-          return <SimpleUserRequisition />
+          return <SimpleUserRequisitionTabs />
         }
         case 1: {
-          return <ReportingOfficerRequisition />
+          return <ReportingOfficerRequisitionTabs />
         }
 
       }
