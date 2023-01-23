@@ -111,7 +111,7 @@ export const getAllCompletedRequisitionsD=async(setRequisitions)=>{
     console.log('hello')
     setRequisitions(
         (await getAllRequisitionsOfDepartmentU(setRequisitions)).filter(
-            requisition => requisition.status>=33
+            requisition => requisition.status==100
         )
     )
 }
@@ -119,7 +119,7 @@ export const getAllCompletedRequisitionsD=async(setRequisitions)=>{
 export const getAllUnCompletedRequisitionsD=async(setRequisitions)=>{
     setRequisitions(
         (await getAllRequisitionsOfDepartmentU(setRequisitions)).filter(
-            requisition => requisition.status<33
+            requisition => requisition.status<100
         )
     )
 }
