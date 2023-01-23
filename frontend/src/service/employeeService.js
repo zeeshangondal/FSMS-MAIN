@@ -54,7 +54,7 @@ export const registerEmployee = async (employeeData, valid, invalid) => {
 export const logInEmployee = async (employeeData, valid, invalid) => {
     const { email, password, userTypeId } = employeeData
     try {
-        const response = await Axios.get(BaseURL + "users/" + email, { params: { email, password, userTypeId } })
+        const response = await Axios.get(BaseURL + "users/" + email, { params: { email, password, userTypeId }})
         if (response.status == 200) {
             if (localStorage.getItem(KEYS.loggedIn) == null)
                 localStorage.setItem(KEYS.loggedIn, JSON.stringify([]))

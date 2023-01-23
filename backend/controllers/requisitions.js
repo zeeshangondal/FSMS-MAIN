@@ -28,8 +28,8 @@ const getAllRequisitions = asyncWrapper(async (req, res, next) => {
 const getSpecificRequisitions = asyncWrapper(async (req, res, next) => {
     const { id } = req.params
     if (id == "loggedInUser") {
-        const { id, email } = req.query
-        const sql = SQL.getAllRequisitions + " WHERE userId=" + id
+        const { id :userId} = req.user
+        const sql = SQL.getAllRequisitions + " WHERE userId=" + userId
         result = await DB.execQuery(sql)
         result.forEach((requisition) => {
             getAllRequisitionItems(requisition)

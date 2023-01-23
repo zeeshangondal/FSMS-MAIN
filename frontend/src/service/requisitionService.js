@@ -1,5 +1,6 @@
 import {  getLoggedInUser } from "./employeeService";
 import Axios from "axios"
+import getHeaders from "./headers";
 
 const KEYS = {
     requisitions: 'requisitions',
@@ -100,7 +101,8 @@ export const getAllUnCompletedRequisitionsU=async(setRequisitions)=>{
 
 export const getAllRequisitionsOfLoggedInU=async(setRequisitions)=> {
     const {id,email}=getLoggedInUser();
-    const response = await Axios.get(BaseURL + "requisitions/" + 'loggedInUser', { params: { id, email } })
+    
+    const response = await Axios.get(BaseURL + "requisitions/" + 'loggedInUser', getHeaders())
     const data=response.data.data
     console.log("Logged in requisitions: ",data)
     setRequisitions(data)
