@@ -23,18 +23,8 @@ const getSingleUser = asyncWrapper(async (req, res, next) => {
     if (result.length == 0) {
         return next(createCustomAPIError("Invalid Credentials: ", StatusCodes.UNAUTHORIZED))
     }
-    let userData=result[0]
-    const token= generateJWT(userData)
-    const user={
-        username:userData.username,
-        userTypeId:userData.userTypeId,
-        designation:userData.designation,
-        email:userData.email,
-        department:userData.department,
-        phoneNumber:userData.phoneNumber,
-        token:token
-    }
-    console.log("User: ",user)
+    let user=result[0]
+    user.token=generateJWT(user)
     return res.status(200).json({ status: "success", data: user })
 })
 const generateJWT=(user)=>{

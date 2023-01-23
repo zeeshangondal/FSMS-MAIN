@@ -1,6 +1,7 @@
 const DB = require("../database/db")
 const asyncWrapper = require("../middlewares/asyncWrapper")
 const { createCustomAPIError } = require('../errors/CustomAPIError')
+const { UnauthenticatedError } = require("../errors")
 
 
 const SQL = {
@@ -27,8 +28,9 @@ const getAllRequisitions = asyncWrapper(async (req, res, next) => {
 
 const getSpecificRequisitions = asyncWrapper(async (req, res, next) => {
     const { id } = req.params
+    const user= req.user
     if (id == "loggedInUser") {
-        const { id :userId} = req.user
+        const { id :userId} = user
         const sql = SQL.getAllRequisitions + " WHERE userId=" + userId
         result = await DB.execQuery(sql)
         result.forEach((requisition) => {
@@ -39,7 +41,10 @@ const getSpecificRequisitions = asyncWrapper(async (req, res, next) => {
         }, 200);
     }
     else if (id == "department") {
-        const { departmentId } = req.query
+        if(user.userTypeId!=1){
+            throw new UnauthenticatedError("Unauthorized access to department's requisition");
+        }
+        const { departmentId } = user
         const sql = SQL.getAllRequisitions + " WHERE Req.departmentId=" + departmentId
         result = await DB.execQuery(sql)
         result.forEach((requisition) => {
@@ -50,6 +55,9 @@ const getSpecificRequisitions = asyncWrapper(async (req, res, next) => {
         }, 200);
     }
     else if (id == "approvedByReportingOfficer") {
+        if(user.userTypeId!=1){
+            throw new UnauthenticatedError("Unauthorized access to department's requisition");
+        }
         const sql = SQL.getAllRequisitions + " WHERE Req.status>=33"
         result = await DB.execQuery(sql)
         result.forEach((requisition) => {
