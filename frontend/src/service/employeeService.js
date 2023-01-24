@@ -3,15 +3,6 @@ import Axios from "axios"
 const KEYS = {
     loggedIn: 'loggedInEmployee'
 }
-const storeKeeper = {
-    username: 'zeeshan',
-    password: 'a',
-    userType: 'storeKeeper'
-}
-
-const getStoreKeeper = () => {
-    return storeKeeper
-}
 
 
 const BaseURL = "http://localhost:3001/api/v1/"
@@ -68,19 +59,6 @@ export const logInEmployee = async (employeeData, valid, invalid) => {
     }
 }
 
-export function logInStoreKeeper(data, valid, invalid) {
-    let storeKeeper = getStoreKeeper();
-    const { username, password } = data
-    if (storeKeeper.username == username && storeKeeper.password == password) {
-        valid()
-        if (localStorage.getItem(KEYS.loggedIn) == null)
-            localStorage.setItem(KEYS.loggedIn, JSON.stringify([]))
-
-        localStorage.setItem(KEYS.loggedIn, JSON.stringify(storeKeeper))
-    }
-    else
-        invalid("Invalid Credentials");
-}
 
 
 

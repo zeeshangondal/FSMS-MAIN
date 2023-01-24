@@ -20,12 +20,6 @@ export const getPackagingOptionsU = async (setPackagingOptions) => {
 
 
 
-// export function addItem(item){
-//     console.log("added", item)
-//     item.id=items.length+1;
-//     items.push(item);
-//     console.log(items);
-// }
 export const addItem=async(itemData,valid,invalid)=>{
     try {
         const response = await Axios.post(BaseURL + "items", itemData);

@@ -1,10 +1,8 @@
 const { getLoggedInUser } = require("./employeeService")
 
-const getHeaders=()=>{
+const getAuthorization = () => {
     return {
-        headers:{
-            authorization: "Bearer "+getLoggedInUser().token
-        }
+        authorization: "Bearer " + getLoggedInUser().token
     }
 }
-module.exports=getHeaders
+module.exports = getAuthorization

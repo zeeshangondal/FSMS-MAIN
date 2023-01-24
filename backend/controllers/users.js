@@ -18,7 +18,11 @@ const getAllUsers = asyncWrapper(async (req, res, next) => {
 const getSingleUser = asyncWrapper(async (req, res, next) => {
     console.log("Got ",req.query)
     const { email,password,userTypeId } = req.query
-    const sql = `SELECT Users.id,username,designation,email,phoneNumber,departmentId,userTypeId, Dep.title AS department, UserT.title AS usertype FROM Users INNER JOIN Department AS Dep ON departmentId=Dep.id  INNER JOIN Usertype AS UserT ON usertypeId=UserT.id WHERE email='${email}' AND password='${password}' AND userTypeId='${userTypeId}'`
+    let sql=""
+    if(userTypeId==2)
+        sql=`SELECT Users.id,username,designation,email,phoneNumber,userTypeId, UserT.title AS usertype FROM Users INNER JOIN Usertype AS UserT ON usertypeId=UserT.id WHERE email='${email}' AND password='${password}' AND userTypeId='${userTypeId}'`
+    else
+        sql = `SELECT Users.id,username,designation,email,phoneNumber,departmentId,userTypeId, Dep.title AS department, UserT.title AS usertype FROM Users INNER JOIN Department AS Dep ON departmentId=Dep.id  INNER JOIN Usertype AS UserT ON usertypeId=UserT.id WHERE email='${email}' AND password='${password}' AND userTypeId='${userTypeId}'`
     result = await DB.execQuery(sql)
     if (result.length == 0) {
         return next(createCustomAPIError("Invalid Credentials: ", StatusCodes.UNAUTHORIZED))
