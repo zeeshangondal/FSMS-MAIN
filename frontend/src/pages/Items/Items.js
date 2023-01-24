@@ -118,7 +118,7 @@ export default function Items() {
         if (item.id === 0)
             itemService.addItem(item,valid,invalid)
         else
-            itemService.updateItem(item,valid,invalid)
+            itemService.updateItem(item,valid,invalid,true, `Item updated successfully` )
         resetForm()
         setRecordForEdit(null);
         setOpenPopup(false)
@@ -149,13 +149,14 @@ export default function Items() {
         const onDelete = (quantity) => {
             let difference = recordForEdit.quantity-quantity.quantity
             if(difference>=0) {
-                recordForEdit.quantity -= quantity.quantity;
-                itemService.updateItem(recordForEdit,valid,invalid);
-                setNotify({
-                    isOpen: true,
-                    message: `Stock of ${quantity.quantity} ${recordForEdit.name} Removed Successfully`,
-                    type: 'success'
-                })
+                let QTA =recordForEdit.quantity- quantity.quantity;
+                let record={
+                    ...recordForEdit,
+                    quantity:QTA
+                }
+                const msg=`Stock of ${quantity.quantity} ${record.name} Removed Successfully`
+                itemService.updateItem(record,valid,invalid,true,msg,getItems);
+
             }else {
                 setNotify({
                 isOpen: true,
@@ -168,14 +169,16 @@ export default function Items() {
         }
 
         const onAdd= (quantity)=>{
-            recordForEdit.quantity += parseInt(quantity.quantity);
-            itemService.updateItem(recordForEdit);
+            let QTA=recordForEdit.quantity
+            QTA+= parseInt(quantity.quantity);
+            let record={
+                ...recordForEdit,
+                quantity:QTA
+            }
+            const msg=`Stock of ${quantity.quantity} ${record.name} Added Successfully`
+            itemService.updateItem(record,valid,invalid,true,msg,getItems);
             setOpenAddPopup(false);
             setRecordForEdit(null);
-            setNotify({
-                isOpen: true,
-                message: `Stock of ${quantity.quantity} ${recordForEdit.name} Items Added Successfully`,
-            })
         }
 
         return (

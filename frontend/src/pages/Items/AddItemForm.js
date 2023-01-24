@@ -29,7 +29,6 @@ function ItemForm(props) {
     function handleSubmit(e){
         e.preventDefault();
         if(validate()){
-            console.log(values);
             props.addItem(values);
         }
     }

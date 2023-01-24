@@ -27,7 +27,7 @@ const PORT=3001
 
 app.use(cors())
 app.use(express.json())
-app.use("/api/v1/items",itemsRouter)
+app.use("/api/v1/items",authenticateUser,itemsRouter)
 app.use("/api/v1/users",usersRouter)
 app.use("/api/v1/requisitions",authenticateUser,requisitionsRouter)
 app.use("/api/v1/departments",departmentsCollectionRouter)

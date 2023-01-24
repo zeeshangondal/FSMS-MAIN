@@ -1,4 +1,5 @@
 import Axios from "axios"
+import getAuthorization from "./headers";
 
 
 const BaseURL = "http://localhost:3001/api/v1/"
@@ -22,7 +23,10 @@ export const getPackagingOptionsU = async (setPackagingOptions) => {
 
 export const addItem=async(itemData,valid,invalid)=>{
     try {
-        const response = await Axios.post(BaseURL + "items", itemData);
+        console.log("Item Data: ",itemData)
+        const response = await Axios.post(BaseURL + "items", {itemData},{
+            headers:getAuthorization()
+        });
         if (response.status == 201) {
             valid("Item added successfully")
         }
@@ -30,27 +34,26 @@ export const addItem=async(itemData,valid,invalid)=>{
             invalid(response.data.msg);
     } catch (e) {
         console.log(e)
-        invalid("Item is already added. Duplicate Items are not allowed");
+        invalid("There is something wrong. Authentication failed");
     }
 }
 
-// export function updateItem(item) {
-//     console.log("updated")
-//     let itemIndex = items.findIndex(x => x.id===item.id);
-//     items[itemIndex] = {...item};
-//}
-export const updateItem=async(itemData,valid,invalid,notify=false)=>{
+
+export const updateItem=async(itemData,valid,invalid,notify=false,msg,getItems)=>{
     try {
-        const response = await Axios.patch(BaseURL + "items/"+itemData.id, itemData);
+        const response = await Axios.patch(BaseURL + "items/"+itemData.id, {itemData},{
+            headers:getAuthorization()
+        });
         if (response.status == 201) {
-            if(notify)
-                valid("Item updated successfully")  
+            if(notify){
+                valid(msg)  
+            }
         }
         else
             if(notify)
                 invalid(response.data.msg);
     } catch (e) {
-        invalid("Item cannot be updated for now!");
+        invalid("Item cannot be updated for server side authentication");
     }
 }
 export function sleep(ms) {
@@ -58,62 +61,28 @@ export function sleep(ms) {
 }
 
 
-// export function deleteItem(item){
-//     items = items.filter(i => i.id!==item.id);
+
+// export const deleteItem=async(itemData,valid,invalid)=>{
+//     console.log("Privded Record : ", itemData);
+//     try {
+//         const response = await Axios.delete(BaseURL + "items/"+itemData.id, itemData);
+//         console.log("Received Response: ", response)
+//         if (response.status == 201) {
+//             valid("Item updated successfully")
+//         }
+//         else
+//             invalid(response.data.msg);
+//     } catch (e) {
+//         invalid("Item cannot be updated for now!");
+//     }
 // }
 
-export const deleteItem=async(itemData,valid,invalid)=>{
-    console.log("Privded Record : ", itemData);
-    try {
-        const response = await Axios.delete(BaseURL + "items/"+itemData.id, itemData);
-        console.log("Received Response: ", response)
-        if (response.status == 201) {
-            valid("Item updated successfully")
-        }
-        else
-            invalid(response.data.msg);
-    } catch (e) {
-        invalid("Item cannot be updated for now!");
-    }
-}
-
-// export function getItems(){
-//     let category = categoryOptions;
-//     let packaging = packagingOptions;
-//     return items.map(x => ({
-//         ...x,
-//         category: category[x.categoryId ].title,
-//         packaging: packaging[x.packagingId].title,
-//     }))
-// }
 
 export const getItems=async(setItems)=>{
-    const response = await Axios.get(BaseURL + "items");
+    const response = await Axios.get(BaseURL + "items",{headers:getAuthorization()});
     const data = response.data.data
     setItems(data)
 }
-
-export const getItemsOnly=async()=>{
-    const response = await Axios.get(BaseURL + "items");
-    const data = response.data.data
-    console.log(data)
-    return data;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

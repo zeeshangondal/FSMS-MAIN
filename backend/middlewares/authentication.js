@@ -13,10 +13,8 @@ const authenticateUser = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
-//    console.log(decoded)
     const { id,username, designation, email , phoneNumber, departmentId,userTypeId, department, usertype} = decoded
     req.user = { id,username, designation, email , phoneNumber, departmentId,userTypeId, department, usertype}
-    console.log("Authenticating!!")    
     next();
   } catch (error) {
     throw new UnauthenticatedError('Authentication failed');

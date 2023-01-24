@@ -25,24 +25,25 @@ const getSingleItem = asyncWrapper(async (req, res, next) => {
 })
 
 const createNewItem = asyncWrapper(async (req, res, next) => {
-    
-    let { name,quantity,packagingId,categoryId } = req.body    
-    const sql = `INSERT INTO items(name,quantity,packagingId,categoryId ) VALUES('${name}',${quantity}, ${packagingId}, ${categoryId})`
+    if(req.user.userTypeId!=2){
+        throw new UnauthenticatedError("Unauthorized add item. Only Store keeper is authorized to add new item");
+    }
+    let { name,quantity,packagingId,categoryId } = req.body.itemData    
+    let sql = `INSERT INTO items(name,quantity,packagingId,categoryId ) VALUES('${name}',${quantity}, ${packagingId}, ${categoryId})`
     await DB.execQuery(sql)
-//    sleep(100)
     sql=SQL.getAllItems+" WHERE It.name="+`'${name}'`;
     result = await DB.execQuery(sql)
-    console.log("Result: ",result)
     res.status(201).json({ status: "success", data: result[0] })
 })
 
 const updateItem = asyncWrapper(async (req, res, next) => {
-    console.log(req.body)
+    if(req.user.userTypeId!=2){
+        throw new UnauthenticatedError("Unauthorized removal of item. Only Store keeper is authorized");
+    }
     const { id } = req.params
-    const { name,quantity,packagingId,categoryId } = req.body
-    sql = `UPDATE items SET name='${name}', quantity =${quantity}, packagingId='${packagingId}', categoryId=${categoryId} WHERE id=${id}`
+    const { name,quantity,packagingId,categoryId } = req.body.itemData
+    let sql = `UPDATE items SET name='${name}', quantity =${quantity}, packagingId='${packagingId}', categoryId=${categoryId} WHERE id=${id}`
     await DB.execQuery(sql)
-    
     sql=SQL.getAllItems+" WHERE It.id="+`${id}`;
     result = await DB.execQuery(sql)
     res.status(201).json({ status: "success", data: result[0] })
