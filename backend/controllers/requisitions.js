@@ -1,6 +1,7 @@
 const DB = require("../database/db")
 const asyncWrapper = require("../middlewares/asyncWrapper")
 const { createCustomAPIError } = require('../errors/CustomAPIError')
+const { UnauthenticatedError } = require("../errors")
 
 
 const SQL = {
@@ -27,9 +28,10 @@ const getAllRequisitions = asyncWrapper(async (req, res, next) => {
 
 const getSpecificRequisitions = asyncWrapper(async (req, res, next) => {
     const { id } = req.params
+    const user= req.user
     if (id == "loggedInUser") {
-        const { id, email } = req.query
-        const sql = SQL.getAllRequisitions + " WHERE userId=" + id
+        const { id :userId} = user
+        const sql = SQL.getAllRequisitions + " WHERE userId=" + userId
         result = await DB.execQuery(sql)
         result.forEach((requisition) => {
             getAllRequisitionItems(requisition)
@@ -39,7 +41,10 @@ const getSpecificRequisitions = asyncWrapper(async (req, res, next) => {
         }, 200);
     }
     else if (id == "department") {
-        const { departmentId } = req.query
+        if(user.userTypeId!=1){
+            throw new UnauthenticatedError("Unauthorized access to department's requisition");
+        }
+        const { departmentId } = user
         const sql = SQL.getAllRequisitions + " WHERE Req.departmentId=" + departmentId
         result = await DB.execQuery(sql)
         result.forEach((requisition) => {
@@ -71,11 +76,9 @@ const insertRequisitionItems = (requisitionId, items) => {
 }
 
 const createNewRequisition = asyncWrapper(async (req, res, next) => {
-    let { department = "TBD", departmentId, userId, items } = req.body
-
+    let { department = "TBD", departmentId, userId, items } = req.body.requisitionData
     let sql = `INSERT INTO Requisition(requestedDate , department ,departmentId ,userId )  VALUES(now(),'${department}', ${departmentId},${userId} )`
     await DB.execQuery(sql)
-
     sql = "SELECT * FROM Requisition ORDER BY id DESC LIMIT 1";
     let response = await DB.execQuery(sql)
     insertRequisitionItems(response[0].id, items)
@@ -88,16 +91,22 @@ const createNewRequisition = asyncWrapper(async (req, res, next) => {
 
 const updateRequisition = asyncWrapper(async (req, res, next) => {
     const { id } = req.params
-    const { query } = req.body
+    const {query} =req.body.data
+    const user= req.user
     if (query == "reportingOfficerApproval") {
-        const { reportingOfficerRemarks } = req.body
+        if(user.userTypeId!=1){
+            throw new UnauthenticatedError("Unauthorized access to requisition approval");
+        }
+        const { reportingOfficerRemarks } = req.body.data
         const sql = `UPDATE Requisition SET approvedByReportingOfficerDate = now() , status = 33, reportingOfficerRemarks='${reportingOfficerRemarks}'  WHERE id=${id}`
         await DB.execQuery(sql)
-        console.log("DONE")
         res.status(201).json({ status: "success", msg: "Rqeuisition updated sucessfully. Given remarks: " + reportingOfficerRemarks })
     }
     else if (query == "storeKeeperApproval") {
-        const { storeKeeperRemarks, items } = req.body
+        if(user.userTypeId!=2){
+            throw new UnauthenticatedError("Unauthorized access to requisition approval");
+        }
+        const { storeKeeperRemarks, items } = req.body.data
         await updateRequisitionItemsForIssuedQTA(items)
         setTimeout(async () => {
             const sql = `UPDATE Requisition SET approvedByStoreKeeperDate  = now(), storeKeeperRemarks='${storeKeeperRemarks}' , status = 66  WHERE id=${id}`
@@ -106,12 +115,15 @@ const updateRequisition = asyncWrapper(async (req, res, next) => {
         }, 100)
     }
     else if (query == "updateRequisition") {
-        const { items,id } = req.body
+        const { items,id } = req.body.data
         await updateRequisitionItems(id,items)
         res.status(201).json({ status: "success", msg: "Requisition updated sucessfully" })
     }
     else if (query == "storeKeeperDeliveryApproval") {
-        const { id } = req.body
+        if(user.userTypeId!=2){
+            throw new UnauthenticatedError("Unauthorized access to requisition delivery approval");
+        }
+        const { id } = req.body.data
         let sql="UPDATE Requisition SET status=100, completionDate=now() WHERE id="+id
         await DB.execQuery(sql)
         res.status(201).json({ status: "success", msg: "Requisition delivered sucessfully" })
@@ -143,7 +155,10 @@ const updateRequisitionItemsForIssuedQTA = async (items) => {
 
 const deleteRequisition = asyncWrapper(async (req, res, next) => {
     const { id } = req.params
-    console.log("Requisition Id: ",id)
+    const {userTypeId}=req.user
+    if(userTypeId!=0){
+        throw new UnauthenticatedError("Unauthorized access to requisition deletion");
+    }
     deleteRequisitionItems(id)
     const sql = `DELETE FROM Requisition WHERE id=${id}`
     setTimeout(async()=>{

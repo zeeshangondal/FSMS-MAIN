@@ -19,20 +19,20 @@ export default function Requisitions() {
     getLoggedInUser()
   }, [0])
 
-  
-  const getUserRequisition = () => {
-    if (loggedInUser.userType === 'storeKeeper')
-      return <StoreKeeperRequisition />
-    else
-      switch (loggedInUser.userTypeId) {
-        case 0: {
-          return <SimpleUserRequisitionTabs />
-        }
-        case 1: {
-          return <ReportingOfficerRequisitionTabs />
-        }
 
+  const getUserRequisition = () => {
+
+    switch (loggedInUser.userTypeId) {
+      case 0: {
+        return <SimpleUserRequisitionTabs />
       }
+      case 1: {
+        return <ReportingOfficerRequisitionTabs />
+      }
+      case 2: {
+        return <StoreKeeperRequisition />
+      }
+    }
   }
   return (
     <div>

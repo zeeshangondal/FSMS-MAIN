@@ -41,9 +41,8 @@ export default function AddRequisitionForm(props) {
 
     const addedItemsHeadCells = [
         {id: 'name', label: 'Name'},
-        {id: 'quantity', label: 'Quantity'},
         {id: 'category', label: 'Category'},
-        {id: 'requestedQuantity', label: 'Requested Quantity', disableSorting: true},
+        {id: 'requestedQuantity', label: 'Requested Quantity', disableSorting: true}
     ]
     const location = useLocation();
 
@@ -319,7 +318,6 @@ export default function AddRequisitionForm(props) {
                                         return (
                                             <TableRow key={item.id}>
                                                 <TableCell>{item.name}</TableCell>
-                                                <TableCell>{item.quantity}</TableCell>
                                                 <TableCell>{item.category}</TableCell>
                                                 <TableCell>{item.requestedQuantity}</TableCell>
                                                 {

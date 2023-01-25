@@ -22,8 +22,9 @@ CREATE TABLE Users(
     FOREIGN KEY (userTypeId) REFERENCES UserType(id)
 );
 
-
-
+//storekeeper user
+INSERT INTO users (username ,designation ,email,phoneNumber, password,userTypeId) 
+VALUES("Zeeshan","Store Keeper","zeeshan@gmail.com","03420555086","zeeshan",2)
 
 INSERTIONS
 
@@ -38,5 +39,5 @@ INSERT INTO Department(id,title ) VALUES
 INSERT INTO Usertype VALUES
     ( 0, 'Simple User' ),
     ( 1, 'ReportingOfficer' ),
-    ( 2, 'Admin' )
+    ( 2, 'Store Keeper' )
 

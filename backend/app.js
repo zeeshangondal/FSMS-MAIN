@@ -1,3 +1,5 @@
+require('dotenv').config();
+require('express-async-errors');
 const mysql = require('mysql');
 const DB=require("./database/db")
 const express=require("express")
@@ -11,6 +13,7 @@ const itemsPackagingCollectionRouter=require("./router/itemsPackagingCollection"
 
 
 const notFound = require('./middlewares/not-found');
+const authenticateUser = require('./middlewares/authentication');
 const errorHandlerMiddleware = require('./middlewares/error-handler');
 const cors = require("cors")
 
@@ -24,9 +27,9 @@ const PORT=3001
 
 app.use(cors())
 app.use(express.json())
-app.use("/api/v1/items",itemsRouter)
+app.use("/api/v1/items",authenticateUser,itemsRouter)
 app.use("/api/v1/users",usersRouter)
-app.use("/api/v1/requisitions",requisitionsRouter)
+app.use("/api/v1/requisitions",authenticateUser,requisitionsRouter)
 app.use("/api/v1/departments",departmentsCollectionRouter)
 app.use("/api/v1/userTypes",userTypesCollectionRouter)
 app.use("/api/v1/itemsCategories",itemsCategoryCollectionRouter)

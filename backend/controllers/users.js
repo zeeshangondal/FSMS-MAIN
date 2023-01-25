@@ -2,7 +2,7 @@ const DB = require("../database/db")
 const asyncWrapper = require("../middlewares/asyncWrapper")
 const { createCustomAPIError } = require('../errors/CustomAPIError')
 const StatusCodes=require("http-status-codes");
-
+const jwt=require("jsonwebtoken");
 
 
 
@@ -14,17 +14,29 @@ const getAllUsers = asyncWrapper(async (req, res, next) => {
 
 
 
-
+//serve as login
 const getSingleUser = asyncWrapper(async (req, res, next) => {
     console.log("Got ",req.query)
     const { email,password,userTypeId } = req.query
-    const sql = `SELECT Users.id,username,designation,email,phoneNumber,departmentId,userTypeId, Dep.title AS department, UserT.title AS usertype FROM Users INNER JOIN Department AS Dep ON departmentId=Dep.id  INNER JOIN Usertype AS UserT ON usertypeId=UserT.id WHERE email='${email}' AND password='${password}' AND userTypeId='${userTypeId}'`
+    let sql=""
+    if(userTypeId==2)
+        sql=`SELECT Users.id,username,designation,email,phoneNumber,userTypeId, UserT.title AS usertype FROM Users INNER JOIN Usertype AS UserT ON usertypeId=UserT.id WHERE email='${email}' AND password='${password}' AND userTypeId='${userTypeId}'`
+    else
+        sql = `SELECT Users.id,username,designation,email,phoneNumber,departmentId,userTypeId, Dep.title AS department, UserT.title AS usertype FROM Users INNER JOIN Department AS Dep ON departmentId=Dep.id  INNER JOIN Usertype AS UserT ON usertypeId=UserT.id WHERE email='${email}' AND password='${password}' AND userTypeId='${userTypeId}'`
     result = await DB.execQuery(sql)
     if (result.length == 0) {
         return next(createCustomAPIError("Invalid Credentials: ", StatusCodes.UNAUTHORIZED))
     }
-    return res.status(200).json({ status: "success", data: result[0] })
+    let user=result[0]
+    user.token=generateJWT(user)
+    return res.status(200).json({ status: "success", data: user })
 })
+const generateJWT=(user)=>{
+    const {id,username, designation, email , phoneNumber, departmentId,userTypeId, department, usertype}= user;
+    const date=new Date()
+    const token=jwt.sign({date, id,username, designation, email , phoneNumber, departmentId,userTypeId, department, usertype},process.env.JWT_SECRET,{expiresIn:'1d'})
+    return token
+}
 
 const registerNewUser = asyncWrapper(async (req, res, next) => {
     console.log(req.body)

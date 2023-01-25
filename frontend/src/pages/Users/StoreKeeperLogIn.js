@@ -62,7 +62,7 @@ export default function LogIn(props) {
     }
 
     const logInUser = async () => {
-        await employeeService.logInStoreKeeper(values,valid,invalid)
+ //       await employeeService.logInStoreKeeper(values,valid,invalid)
     }
     const handleSubmit = e => {
         e.preventDefault()
