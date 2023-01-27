@@ -21,14 +21,16 @@ import {useNavigate} from "react-router";
 import {Search} from "@mui/icons-material";
 import Input from "../../../components/controls/Input";
 import AddIcon from "@mui/icons-material/Add";
+import HoverPopover from "../../../components/controls/HoverPopover";
 
 
 const headCells = [
   { id: 'sr', label: 'Sr.' },
   { id: 'name', label: 'Name' },
   { id: 'date', label: 'Date' },
+  { id: 'time', label: 'Time' },
   { id: 'status', label: 'Status' },
-  { id: 'actions', label: 'Actions', disableSorting: true },
+  { id: 'actions', label: 'Actions', disableSorting: true , align: 'right'},
 
 ]
 
@@ -81,6 +83,13 @@ export default function Requisitions(props) {
   }
 
 
+  const getStatusText = (status)=>{
+    if(status===0) return 'Pending for approval of Reporting Officer'
+    else if(status===33) return 'Pending for approval of Store Keeper'
+    else if(status===66) return 'Pending for delivery'
+    else return ''
+  }
+
   const openInViewRequisitionPage = (requisitionForm) => {
     gotoViewRequisitionPage(requisitionForm)
   }
@@ -125,12 +134,14 @@ export default function Requisitions(props) {
                     <StyledTableRow key={requisitionForm.id}>
                       <TableCell>{sr++}</TableCell>
                       <TableCell>{requisitionForm.username}</TableCell>
-                      <TableCell>{requisitionForm.requestedDate}</TableCell>
-                      
-                      <TableCell>
-                        <LinearProgress variant="determinate" value={requisitionForm.status} />
+                      <TableCell>{(new Date(requisitionForm.requestedDate)).toLocaleDateString()}</TableCell>
+                      <TableCell>{(new Date(requisitionForm.requestedDate)).toLocaleTimeString()}</TableCell>
+                      <TableCell >
+                        <HoverPopover  text={getStatusText(requisitionForm.status)} >
+                          <LinearProgress variant="determinate" value={requisitionForm.status}/>
+                        </HoverPopover>
                       </TableCell>
-                      <TableCell>
+                      <TableCell align='right'>
                         <Controls.ActionButton color='primary' onClick={() => openInViewRequisitionPage(requisitionForm)}>
                           <VisibilityIcon />
                         </Controls.ActionButton>

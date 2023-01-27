@@ -39,18 +39,24 @@ const styles = {
 
 export default function AddRequisitionForm(props) {
 
-    const addedItemsHeadCells = [
-        {id: 'name', label: 'Name'},
-        {id: 'category', label: 'Category'},
-        {id: 'requestedQuantity', label: 'Requested Quantity', disableSorting: true}
-    ]
     const location = useLocation();
 
 
     const {recordForEdit, viewOnly = false, isHod = true} = location.state;
 
+
+    const addedItemsHeadCells = [
+        {id: 'name', label: 'Name'},
+        {id: 'category', label: 'Category'},
+        {id: 'requestedQuantity', label: 'Requested Quantity', disableSorting: true}
+    ]
+
     const classes = styles;
 
+    if(!recordForEdit){
+        addedItemsHeadCells.splice(1, 0, {id: 'totalQuantity', label: 'Total Quantity'});
+
+    }
     if (!viewOnly) {
         addedItemsHeadCells.push({id: 'actions', label: 'Actions', disableSorting: true})
     }
@@ -81,6 +87,8 @@ export default function AddRequisitionForm(props) {
     const navigate = useNavigate();
 
     React.useEffect(() => {
+        console.log('record for edit test start');
+        console.log('record for edit test end');
         if (recordForEdit != null) {
             setAddedItems([
                 ...recordForEdit.items
@@ -318,6 +326,7 @@ export default function AddRequisitionForm(props) {
                                         return (
                                             <TableRow key={item.id}>
                                                 <TableCell>{item.name}</TableCell>
+                                                {!recordForEdit?<TableCell>{item.quantity}</TableCell>:<></>}
                                                 <TableCell>{item.category}</TableCell>
                                                 <TableCell>{item.requestedQuantity}</TableCell>
                                                 {
@@ -437,19 +446,19 @@ export default function AddRequisitionForm(props) {
                     <Grid item xs={12}>
                         {values.status >= 33 || isHod ?
                             <>
-                                <h6>{values.status >= 33 ? `Approved by ${isHod ? "you" : `Reporting Officer(${values.reportingOfficer})`} on: ` + values.approvedByReportingOfficerDate : ""}</h6>
-                                <h6>{isHod ? "Your " : "Reporting Officer's "} Remarks</h6>
-                                <Input
+                                <h6>{values.status >= 33 ? `Approved by ${isHod ? "you" : `Reporting Officer(${values.reportingOfficer})`} on: ` + (new Date(values.approvedByReportingOfficerDate)).toLocaleDateString() : ""}</h6>
+                                <h6>{isHod ? "Your " : "Reporting Officer's "} Remarks: {values.status>=33 ? values.reportingOfficerRemarks:''}</h6>
+                                {values.status>=33?<></>:<Input
                                     placeholder="Reporting Officer Remarks "
                                     name="reportingOfficerRemarks"
                                     value={values.reportingOfficerRemarks}
                                     onChange={handleInputChange}
-                                    disabled={values.status >= 33}
                                     multiline
                                     fullWidth
                                     rows={2}
                                     maxRows={4}
-                                /></> : ""
+                                />}
+                            </> : ""
                         }
                         {
                             values.status >= 66 ?

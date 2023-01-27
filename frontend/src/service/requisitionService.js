@@ -113,10 +113,18 @@ export const getAllRequisitionsOfLoggedInU = async (setRequisitions) => {
     return data;
 }
 
+export const getAllApprovedRequisitionsD = async (setRequisitions) => {
+    setRequisitions(
+        (await getAllRequisitionsOfDepartmentU(setRequisitions)).filter(
+            requisition => requisition.status > 32 && requisition.status<66
+        )
+    )
+}
+
 export const getAllCompletedRequisitionsD = async (setRequisitions) => {
     setRequisitions(
         (await getAllRequisitionsOfDepartmentU(setRequisitions)).filter(
-            requisition => requisition.status == 100
+            requisition => requisition.status > 65
         )
     )
 }
@@ -124,7 +132,7 @@ export const getAllCompletedRequisitionsD = async (setRequisitions) => {
 export const getAllUnCompletedRequisitionsD = async (setRequisitions) => {
     setRequisitions(
         (await getAllRequisitionsOfDepartmentU(setRequisitions)).filter(
-            requisition => requisition.status < 100
+            requisition => requisition.status < 32
         )
     )
 }

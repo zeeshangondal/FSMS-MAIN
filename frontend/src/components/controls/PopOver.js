@@ -19,14 +19,17 @@ export default function BasicPopover(props) {
     const id = open ? 'simple-popover' : undefined;
 
     return (
-        <div>
+        <span >
             {/*<Button aria-describedby={id} variant="contained" onClick={handleClick}>*/}
             {/*    Open Popover*/}
             {/*</Button>*/}
-            <ActionButton
-                onClick={handleClick}>
-                <FilterListIcon fontSize="medium"/>
-            </ActionButton>
+            {/*<ActionButton*/}
+            {/*    onClick={handleClick}>*/}
+            {/*    <FilterListIcon fontSize="medium"/>*/}
+            {/*</ActionButton>*/}
+            <span >
+            { React.cloneElement( props.content, { onClick: handleClick } ) }
+            </span>
             <Popover
                 sx={{marginTop:2}}
                 id={id}
@@ -43,6 +46,6 @@ export default function BasicPopover(props) {
                 </div>
                 {/*<Typography sx={{ p: 2 }}>The content of the Popover.</Typography>*/}
             </Popover>
-        </div>
+        </span>
     );
 }

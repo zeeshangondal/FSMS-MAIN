@@ -31,6 +31,7 @@ import * as service from "../../service/itemService";
 import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import PopOver from "../../components/controls/PopOver";
 import BasicPopover from "../../components/controls/PopOver";
+import FilterListIcon from "@mui/icons-material/FilterList";
 
 const styles = {
     pageContent: {
@@ -209,7 +210,12 @@ export default function Items() {
                                 startIcon={<AddIcon/>}
                                 onClick={() => { setOpenPopup(true); setRecordForEdit(null); }}
                             />
-                            <BasicPopover>
+                            <BasicPopover
+                                content={
+                                <ActionButton>
+                                <FilterListIcon fontSize="medium"/>
+                                </ActionButton>}
+                            >
                                 <Input
                                     name="quantity"
                                     label="Quantity"

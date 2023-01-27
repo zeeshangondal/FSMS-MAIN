@@ -21,13 +21,7 @@ import HoverPopover from "../../../components/controls/HoverPopover";
 import {useNavigate} from "react-router";
 import {useTheme} from "@mui/material/styles";
 import Input from "../../../components/controls/Input";
-
-const headCells = [
-  { id: 'sr', label: 'Sr.' },
-  { id: 'date', label: 'Date' },
-  { id: 'status', label: 'Status' },
-  { id: 'actions', label: 'Actions', disableSorting: true }
-]
+import Button from "../../../components/controls/Button";
 
 const styles = {
   pageContent: {
@@ -54,10 +48,44 @@ export default function Requisitions(props) {
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', subTitle: '' })
   const [viewOnly,setViewOnly] = useState(false);
   const navigate = useNavigate();
-  const theme = useTheme();
-  const [value, setValue] = React.useState(0);
+  const [searchDate, setSearchDate] = useState(new Date());
 
   let sr=1
+
+    const handleDateSearch = newValue => {
+      let target="";
+      if(newValue!=="") {
+          setSearchDate(newValue);
+          target = (new Date(newValue.target.value)).toLocaleDateString()
+      }
+        setFilterFn({
+            fn: items => {
+                if (target === "")
+                    return items;
+                else {
+                    return items.filter(x => (new Date(x.requestedDate)).toLocaleDateString() === (target))
+                }
+            }
+        })
+    }
+
+    const headCells = [
+        { id: 'sr', label: 'Sr.' },
+        { id: 'date', label: 'Date' , search:
+            <div>
+                <Controls.DatePicker
+                name="verifiedDate"
+                label="Date"
+                value={searchDate}
+                onChange={handleDateSearch}
+                />
+                <Button sx={{display:'block'}} text="Reset" onClick={()=>handleDateSearch("")}/>
+            </div>
+        },
+        { id: 'time', label: 'Time' },
+        { id: 'status', label: 'Status' },
+        { id: 'actions', label: 'Actions', disableSorting: true, align: 'right' }
+    ]
 
   const {
     TblContainer,
@@ -66,7 +94,7 @@ export default function Requisitions(props) {
     recordsAfterPagingAndSorting
   } = useTable(records, headCells, filterFn)
 
-  useEffect(()=>{
+    useEffect(()=>{
     // requisitionService.getAllRequisitionsOfLoggedInU(setRecords)
       props.update(setRecords);
   },[0])
@@ -77,15 +105,17 @@ export default function Requisitions(props) {
     else if(status===66) return 'Pending for delivery'
     else return ''
   }
-
-  const handleSearch = e => {
+    const handleSearch = e => {
     let target = e.target;
     setFilterFn({
       fn: items => {
         if (target.value === "")
           return items;
-        else
-          return items.filter(x => x.fullName.toLowerCase().includes(target.value))
+        else {
+            console.log(items)
+            return items;
+            // return items.filter(x => x.fullName.toLowerCase().includes(target.value))
+        }
       }
     })
   }
@@ -157,6 +187,7 @@ export default function Requisitions(props) {
                   <Controls.Button
                       text="Add New"
                       variant="outlined"
+                      size="medium"
                       startIcon={<AddIcon />}
                       onClick={() => { gotoAddNewRequisitionPage();}}
                   />
@@ -171,13 +202,14 @@ export default function Requisitions(props) {
                     <StyledTableRow key={requisitionForm.id}>
                       <TableCell>{sr++}</TableCell>
 
-                      <TableCell>{requisitionForm.requestedDate}</TableCell>
+                        <TableCell>{(new Date(requisitionForm.requestedDate)).toLocaleDateString()}</TableCell>
+                        <TableCell>{(new Date(requisitionForm.requestedDate)).toLocaleTimeString()}</TableCell>
                       <TableCell>
                         <HoverPopover  text={getStatusText(requisitionForm.status)} >
                           <LinearProgress variant="determinate" value={requisitionForm.status}/>
                         </HoverPopover>
                       </TableCell>
-                      <TableCell>
+                      <TableCell  align='right'>
                         {
                           requisitionForm.status===0 ?
                               <Controls.ActionButton color='primary' onClick={() => openInAddRequisitionPage(requisitionForm)}>

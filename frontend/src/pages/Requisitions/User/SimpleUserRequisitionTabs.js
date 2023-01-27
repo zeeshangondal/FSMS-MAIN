@@ -51,22 +51,21 @@ export default function SimpleUserRequisitionTabs() {
     return (
         <>
             <Paper sx={classes.pageContent}>
-                {<h2>Simple User</h2>}
-                {<h4>{employeeService.getLoggedInUser().department } , {employeeService.getLoggedInUser().username}</h4>}
+                {/*{<h2>Simple User</h2>}*/}
+                {/*{<h4>{employeeService.getLoggedInUser().department } , {employeeService.getLoggedInUser().username}</h4>}*/}
 
                 <Box >
-                    <AppBar position="static" elevation={0} sx={{ bgcolor: 'white', width: 500 }}>
+                    <AppBar position="static" elevation={0} sx={{ bgcolor: 'white', width: 500, marginLeft:3}}>
                         <Tabs
                             value={value}
                             onChange={handleChange}
                             indicatorColor="primary"
                             // textColor="inherit"
-                            sx={{ fontWeight: 'bold' }}
                             variant="fullWidth"
                         // aria-label="full width tabs example"
                         >
-                            <Tab label="Pending" bold {...a11yProps(0)} />
-                            <Tab label="Completed" bold  {...a11yProps(1)} />
+                            <Tab sx={{'&:hover': {background: '#F4F5FD'}}} label="Pending"bold  {...a11yProps(0)} />
+                            <Tab sx={{'&:hover': {background: '#F4F5FD'}}} label="Completed" bold  {...a11yProps(1)} />
                         </Tabs>
                     </AppBar>
                     <SwipeableViews

@@ -10,6 +10,7 @@ import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material/styles";
 import Requisitions from "./ReportingOfficerRequisitions";
 import {
+    getAllApprovedRequisitionsD,
     getAllCompletedRequisitionsD,
     getAllUnCompletedRequisitionsD
 } from "../../../service/requisitionService";
@@ -46,8 +47,8 @@ export default function ReportingOfficerRequisitionTabs() {
     return (
         <>
             <Paper sx={classes.pageContent}>
-                {<h2>Reporting Officer</h2>}
-                {<h4>{employeeService.getLoggedInUser().department } , {employeeService.getLoggedInUser().username}</h4>}
+                {/*{<h2>Reporting Officer</h2>}*/}
+                {/*{<h4>{employeeService.getLoggedInUser().department } , {employeeService.getLoggedInUser().username}</h4>}*/}
 
                 <Box >
                     <AppBar position="static" elevation={0} sx={{ bgcolor: 'white', width: 500 }}>
@@ -59,8 +60,9 @@ export default function ReportingOfficerRequisitionTabs() {
                             variant="fullWidth"
                         // aria-label="full width tabs example"
                         >
-                            <Tab label="Pending" bold {...a11yProps(0)} />
-                            <Tab label="Completed" bold  {...a11yProps(1)} />
+                            <Tab sx={{'&:hover': {background: '#F4F5FD'}}} label="Pending" bold {...a11yProps(0)} />
+                            <Tab sx={{'&:hover': {background: '#F4F5FD'}}} label="Approved" bold  {...a11yProps(1)} />
+                            <Tab sx={{'&:hover': {background: '#F4F5FD'}}} label="Completed" bold  {...a11yProps(2)} />
                         </Tabs>
                     </AppBar>
                     <SwipeableViews
@@ -72,6 +74,9 @@ export default function ReportingOfficerRequisitionTabs() {
                             <Requisitions update={getAllUnCompletedRequisitionsD}></Requisitions>
                         </TabPanel>
                         <TabPanel value={value} index={1} dir={theme.direction}>
+                            <Requisitions update={getAllApprovedRequisitionsD}></Requisitions>
+                        </TabPanel>
+                        <TabPanel value={value} index={2} dir={theme.direction}>
                             <Requisitions update={getAllCompletedRequisitionsD}></Requisitions>
                         </TabPanel>
                     </SwipeableViews>

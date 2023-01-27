@@ -13,6 +13,9 @@ import MenuIcon from '@mui/icons-material/Menu';
 import MiniDrawer from "./Drawer";
 import LoginIcon from '@mui/icons-material/Login';
 import FollowTheSignsIcon from '@mui/icons-material/FollowTheSigns';
+import {getLoggedInUser} from "../service/employeeService";
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import BasicPopover from "./controls/PopOver";
 
 const drawerWidth = 240;
 
@@ -77,8 +80,9 @@ export default function AppBarWithDrawer() {
 
     return (
         <>
-            <AppBar position="fixed" open={open} data-testid="appBar">
-                <Toolbar>
+            <AppBar position="fixed" open={open} >
+                <Toolbar sx={{display:'flex', justifyContent:'space-between',alignItems:'center'}}>
+                    <div style={{display:'flex',alignItems:'center'}}>
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
@@ -91,9 +95,26 @@ export default function AppBarWithDrawer() {
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" noWrap component="div">
+                    <Typography variant="h6" noWrap component="span">
                         Inventory System
                     </Typography>
+                    </div>
+                    <div style={{display:'flex',alignItems:'center',gap:10}}>
+                    <Typography  variant="h6" noWrap component="span">{getLoggedInUser().username}</Typography>
+                        <BasicPopover
+                            content={<IconButton  ><ArrowDropDownIcon  sx={{ color: 'white' }}/></IconButton>}
+                        >
+                            <div>
+                                <div>
+                                    Change Password
+                                </div>
+                                <hr/>
+                                <div>
+                                    Logout
+                                </div>
+                            </div>
+                        </BasicPopover>
+                    </div>
                 </Toolbar>
             </AppBar>
             <MiniDrawer open={open} setOpen={setOpen} handleDrawerOpen={handleDrawerOpen} handleDrawerClose={handleDrawerClose} list={list}/>

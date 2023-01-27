@@ -2,6 +2,11 @@ import React, { useState } from 'react'
 import {Table, TableHead, TableRow, TableCell, TableSortLabel, tableCellClasses} from '@mui/material'
 import TablePagination from '@mui/material/TablePagination';
 import { styled } from '@mui/material/styles'
+import { Search } from "@mui/icons-material";
+import BasicPopover from "./controls/PopOver";
+import IconButton from "@mui/material/IconButton";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import Controls from "./controls/Controls";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -50,6 +55,13 @@ export default function useTable(records, headCells,filterFn) {
                                     {headCell.label}
                                 </TableSortLabel>
                             }
+                            {headCell.search ?
+                                <BasicPopover
+                                    content={<IconButton size="small"  ><Search  /></IconButton>}
+                                >
+                                    {headCell.search}
+                                </BasicPopover>
+                                :<></>}
                         </StyledTableCell>))
                 }
             </TableRow>
