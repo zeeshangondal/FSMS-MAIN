@@ -78,17 +78,16 @@ export default function AddRequisitionForm(props) {
     const [notify, setNotify] = useState({isOpen: false, message: '', type: ''})
     const [openPopup, setOpenPopup] = useState(false)
     const [confirmDialog, setConfirmDialog] = useState({isOpen: false, title: '', subTitle: ''})
-    const [items,setItems] = useState([]);
+    const [items,setItems] = useState();
     const [categoryOptions, setCategoryOptions] = useState([]);
     const [packagingOptions, setPackagingOptions] = useState([]);
-    const [currentItems, setcurrentItems] = useState([]);
+    const [currentItem, setCurrentItem] = useState({});
     const [added,setAdded] = useState(true);
     const [selectedValue, setSelectedValue] = useState('');
+    const [reqQuantity,setReqQuantity] = useState(0);
     const navigate = useNavigate();
 
     React.useEffect(() => {
-        console.log('record for edit test start');
-        console.log('record for edit test end');
         if (recordForEdit != null) {
             setAddedItems([
                 ...recordForEdit.items
@@ -134,7 +133,16 @@ export default function AddRequisitionForm(props) {
     } = useTable(addedItems, addedItemsHeadCells, filterFn)
 
     const addItemToRequisition = (item) => {
-        if (addedItems.find((it) => it.id === item.id)) {
+        if(reqQuantity<=0 || reqQuantity>currentItem.quantity){
+            setNotify({
+                isOpen: true,
+                message: `Select Right Quantity before Adding `,
+                type: 'error'
+            })
+            return
+        }
+
+        if (addedItems.find((it) => it.id === item.id) ) {
             setNotify({
                 isOpen: true,
                 message: `${item.name} already been added `,
@@ -143,10 +151,12 @@ export default function AddRequisitionForm(props) {
             return
         }
 
-        setAddedItems([
-            ...addedItems,
-            item
-        ])
+        currentItem.requestedQuantity = reqQuantity
+        setAddedItems([...addedItems,item])
+        setCurrentItem({});
+        setSelectedValue('');
+        setAdded(true);
+
         setNotify({
             isOpen: true,
             message: `${item.requestedQuantity} ${item.name} Added Successfully`,
@@ -155,7 +165,9 @@ export default function AddRequisitionForm(props) {
     }
 
     const onRemoveCurrentItem = () => {
-        setcurrentItems([])
+        setCurrentItem({})
+        setReqQuantity(0);
+        setSelectedValue('');
         setAdded(true);
     }
 
@@ -240,8 +252,11 @@ export default function AddRequisitionForm(props) {
         })
     }
 
-    const handleItemQuantityChange = (e, item) => {
+    const handleItemQuantityChange = (e) => {
+        e.nativeEvent.stopImmediatePropagation()
         const reqQTA = e.target.value
+        setReqQuantity(reqQTA);
+        console.log(reqQuantity);
         if (reqQTA < 0) {
             setNotify({
                 isOpen: true,
@@ -249,26 +264,28 @@ export default function AddRequisitionForm(props) {
                 type: 'error'
             })
         }
-            else if (reqQTA > currentItems[0].quantity) {
+            else if (reqQTA > currentItem.quantity) {
                 setNotify({
                     isOpen: true,
                     message: `Issued items cannot be a more than requested items `,
                     type: 'error'
                 })
         }
-        else
-            currentItems[0].requestedQuantity = reqQTA
+        // else
+        //     currentItems[0].requestedQuantity = reqQTA
     }
 
 
     const handlecurrentItemsChange = e => {
-        setcurrentItems([items.filter(item=>item.name===e)[0]]);
+        console.log(e);
+        setCurrentItem(items.find(item=>item.name===e));
     }
 
     const addEditableRow = () => {
         console.log(items[0]);
-        setcurrentItems([...currentItems,items[0]]);
-        console.log(currentItems);
+        // setReqQuantity(0);
+        // setcurrentItem(items[0]);
+        console.log(currentItem);
         setAdded(false);
     }
 
@@ -316,7 +333,7 @@ export default function AddRequisitionForm(props) {
                         </div>
                         : ""
                 }
-                {addedItems.length === 0 && currentItems.length === 0 ? <h3 style={{margin: '2%'}}>No Item added</h3> :
+                {addedItems.length === 0 && currentItem==={} ? <h3 style={{margin: '2%'}}>No Item added</h3> :
                     <>
                         <TblContainer>
                             <TblHead/>
@@ -369,9 +386,8 @@ export default function AddRequisitionForm(props) {
                                     })
                                 }
                                 {
-                                    currentItems.map(item=>{
-                                        return (
-                                            <TableRow key={item.id}>
+                                    !added?
+                                            <TableRow >
                                                 {/*<TableCell>{item.name}</TableCell>*/}
                                                 <TableCell>
                                                     <Autocomplete
@@ -387,21 +403,22 @@ export default function AddRequisitionForm(props) {
                                                     />
                                                 </TableCell>
                                                 <TableCell>
-                                                    {item.quantity}
+                                                    {currentItem.quantity}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {item.category}
+                                                    {currentItem.category}
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Input type='number' style={{ width: '55px', border: 'none' }} onChange={(e) => handleItemQuantityChange(e)} />
+                                                    <TextField
+                                                        style={{width:120}}
+                                                        type="number"
+                                                        variant="outlined"
+                                                        placeholder="Quantity"
+                                                        size="small"
+                                                        autoFocus
+                                                        value={reqQuantity}
+                                                        onChange={(e)=>handleItemQuantityChange(e)}/>
                                                 </TableCell>
-                                                {
-                                                    values.status >= 66 ?
-                                                        <>
-                                                            <TableCell>{item.issuedQuantity}</TableCell>
-                                                        </>
-                                                        : ''
-                                                }
                                                 {
                                                     viewOnly === true ? ''
                                                         :
@@ -410,9 +427,7 @@ export default function AddRequisitionForm(props) {
                                                                 <ActionButton
                                                                     color="success"
                                                                     onClick={() => {
-                                                                        setAddedItems([...addedItems,item])
-                                                                        setcurrentItems([]);
-                                                                        setAdded(true);
+                                                                        addItemToRequisition(currentItem);
                                                                     }}>
                                                                     <SaveIcon/>
                                                                 </ActionButton>
@@ -426,8 +441,8 @@ export default function AddRequisitionForm(props) {
                                                         </>
                                                 }
                                             </TableRow>
-                                        )
-                                    })
+                                        :
+                                        <></>
                                 }
                             </TableBody>
                         </TblContainer>
@@ -477,7 +492,7 @@ export default function AddRequisitionForm(props) {
                                     /></>
                                 : ""
                         }
-                        <h4>{values.status == 100 ? `Requisition Completed. Completion Date: ${values.completionDate}` : ""}</h4>
+                        <h4>{values.status === 100 ? `Requisition Completed. Completion Date: ${values.completionDate}` : ""}</h4>
 
 
                     </Grid>

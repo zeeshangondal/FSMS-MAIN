@@ -203,6 +203,30 @@ export const sendStoreKeeperApprovalWithIssuedQTA = async (data, valid, invalid)
     }
 }
 
+
+export const getAllRequisitionsNotApprovedByStoreKeeperU = async (setRequisitions) => {
+    setRequisitions(
+        (await getAllRequisitionsApprovedByReportingOfficerU(setRequisitions)).filter(
+            requisition => requisition.status < 66
+        )
+    )
+}
+
+export const getAllRequisitionsApprovedByStoreKeeperU = async (setRequisitions) => {
+    setRequisitions(
+        (await getAllRequisitionsApprovedByReportingOfficerU(setRequisitions)).filter(
+            requisition => requisition.status === 66
+        )
+    )
+}
+
+export const getAllRequisitionsDeliveredByStoreKeeperU = async (setRequisitions) => {
+    setRequisitions(
+        (await getAllRequisitionsApprovedByReportingOfficerU(setRequisitions)).filter(
+            requisition => requisition.status === 100
+        )
+    )
+}
 export const getAllRequisitionsApprovedByReportingOfficerU = async (setRequisitions) => {
     const response = await Axios.get(BaseURL + "requisitions/" + "approvedByReportingOfficer" , 
     {
@@ -210,4 +234,5 @@ export const getAllRequisitionsApprovedByReportingOfficerU = async (setRequisiti
     })
     const data = response.data.data
     setRequisitions(data)
+    return data;
 }

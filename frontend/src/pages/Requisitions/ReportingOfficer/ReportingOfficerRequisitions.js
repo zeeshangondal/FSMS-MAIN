@@ -22,17 +22,9 @@ import {Search} from "@mui/icons-material";
 import Input from "../../../components/controls/Input";
 import AddIcon from "@mui/icons-material/Add";
 import HoverPopover from "../../../components/controls/HoverPopover";
+import Button from "../../../components/controls/Button";
 
 
-const headCells = [
-  { id: 'sr', label: 'Sr.' },
-  { id: 'name', label: 'Name' },
-  { id: 'date', label: 'Date' },
-  { id: 'time', label: 'Time' },
-  { id: 'status', label: 'Status' },
-  { id: 'actions', label: 'Actions', disableSorting: true , align: 'right'},
-
-]
 
 const styles = {
   pageContent: {
@@ -56,12 +48,47 @@ export default function Requisitions(props) {
   const [filterFn, setFilterFn] = useState({ fn: items => { return items; } })
   const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' })
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', subTitle: '' })
+  const [searchDate, setSearchDate] = useState(new Date());
   const navigate = useNavigate()
 
-  React.useEffect(()=>{
-    // requisitionService.getAllRequisitionsOfDepartmentU(setRecords)
-    props.update(setRecords);
-  },[0])
+
+  const handleDateSearch = newValue => {
+    let target="";
+    if(newValue!=="") {
+      setSearchDate(newValue);
+      target = (new Date(newValue.target.value)).toLocaleDateString()
+    }
+    setFilterFn({
+      fn: items => {
+        if (target === "")
+          return items;
+        else {
+          return items.filter(x => (new Date(x.requestedDate)).toLocaleDateString() === (target))
+        }
+      }
+    })
+  }
+
+  const headCells = [
+    { id: 'sr', label: 'Sr.' },
+    { id: 'name', label: 'Name' },
+    { id: 'date', label: 'Date' , search:
+          <div>
+            <Controls.DatePicker
+                name="verifiedDate"
+                label="Date"
+                value={searchDate}
+                onChange={handleDateSearch}
+            />
+            <Button sx={{display:'block'}} text="Reset" onClick={()=>handleDateSearch("")}/>
+          </div>
+    },
+    { id: 'time', label: 'Time' },
+    { id: 'status', label: 'Status' },
+    { id: 'actions', label: 'Actions', disableSorting: true , align: 'right'},
+
+  ]
+
   let sr=1;
   const {
     TblContainer,
@@ -69,6 +96,12 @@ export default function Requisitions(props) {
     TblPagination,
     recordsAfterPagingAndSorting
   } = useTable(records, headCells, filterFn)
+
+
+  React.useEffect(()=>{
+    // requisitionService.getAllRequisitionsOfDepartmentU(setRecords)
+    props.update(setRecords);
+  },[0])
 
   const handleSearch = e => {
     let target = e.target;

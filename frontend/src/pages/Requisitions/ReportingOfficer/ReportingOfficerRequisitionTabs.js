@@ -20,7 +20,7 @@ import * as employeeService from "../../../service/employeeService";
 const styles = {
     pageContent: {
         margin: (theme) => theme.spacing(5),
-        padding: (theme) => theme.spacing(3)
+        paddingTop: (theme) => theme.spacing(3)
     }
 }
 
@@ -47,11 +47,8 @@ export default function ReportingOfficerRequisitionTabs() {
     return (
         <>
             <Paper sx={classes.pageContent}>
-                {/*{<h2>Reporting Officer</h2>}*/}
-                {/*{<h4>{employeeService.getLoggedInUser().department } , {employeeService.getLoggedInUser().username}</h4>}*/}
-
                 <Box >
-                    <AppBar position="static" elevation={0} sx={{ bgcolor: 'white', width: 500 }}>
+                    <AppBar position="static" elevation={0} sx={{ bgcolor: 'white', width: 500 , marginLeft:3}}>
                         <Tabs
                             value={value}
                             onChange={handleChange}

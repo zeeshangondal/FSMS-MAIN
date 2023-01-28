@@ -45,7 +45,7 @@ export default function useTable(records, headCells,filterFn) {
             <TableRow>
                 {
                     headCells.map(headCell => (
-                        <StyledTableCell sx={headCell.align === 'right' ? {paddingRight : 8}:undefined} key={headCell.id} align={headCell.align||'left'}
+                        <StyledTableCell sx={(headCell.align === 'right' ? {paddingRight : 8}:undefined)} key={headCell.id} align={headCell.align||'left'}
                                    sortDirection={orderBy === headCell.id ? order : false}>
                             {headCell.disableSorting ? headCell.label :
                                 <TableSortLabel
@@ -57,7 +57,7 @@ export default function useTable(records, headCells,filterFn) {
                             }
                             {headCell.search ?
                                 <BasicPopover
-                                    content={<IconButton size="small"  ><Search  /></IconButton>}
+                                    content={<IconButton size="small" sx={{marginLeft:5}} ><Search  /></IconButton>}
                                 >
                                     {headCell.search}
                                 </BasicPopover>

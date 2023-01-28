@@ -1,123 +1,176 @@
-import React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
-import MuiAppBar from '@mui/material/AppBar';
+import * as React from 'react';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import MoreTimeIcon from '@mui/icons-material/MoreTime';
-import VaccinesIcon from '@mui/icons-material/Vaccines';
-import AddTask from '@mui/icons-material/AddTask'
-import AddIcon from '@mui/icons-material/Add'
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
-import MiniDrawer from "./Drawer";
-import LoginIcon from '@mui/icons-material/Login';
-import FollowTheSignsIcon from '@mui/icons-material/FollowTheSigns';
+import Container from '@mui/material/Container';
+import Avatar from 'react-avatar';
+import Button from '@mui/material/Button';
+import Tooltip from '@mui/material/Tooltip';
+import MenuItem from '@mui/material/MenuItem';
+import AdbIcon from '@mui/icons-material/Adb';
 import {getLoggedInUser} from "../service/employeeService";
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import BasicPopover from "./controls/PopOver";
+import {useNavigate} from "react-router";
 
-const drawerWidth = 240;
+const pages = ['Products', 'Pricing', 'Blog'];
+const settings = ['Change Password', 'Logout'];
 
-const AppBar = styled(MuiAppBar, {
-    shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(['width', 'margin'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-    }),
-    ...(open && {
-        marginLeft: drawerWidth,
-        width: `calc(100% - ${drawerWidth}px)`,
-        transition: theme.transitions.create(['width', 'margin'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    }),
-}));
+function ResponsiveAppBar() {
+    const [anchorElNav, setAnchorElNav] = React.useState(null);
+    const [anchorElUser, setAnchorElUser] = React.useState(null);
+    const navigate = useNavigate();
 
-const list = [
-    {
-        text:'Items',
-        icon:<AddIcon/>,
-        route:'/items',
-    },
-    {
-        text:'Requisitions',
-        icon:<AddTask/>,
-        route:'/requisition',
-    },
-    {
-        text:'LogIn',
-        icon:<LoginIcon/>,
-        route:'/login',
-    },
-    {
-        text:'StoreKeeperLogIn',
-        icon:<LoginIcon/>,
-        route:'/storeKeeperLogin',
-    },
-    {
-        text:'Register',
-        icon:<FollowTheSignsIcon/>,
-        route:'/register',
-    },
-
-
-]
-
-export default function AppBarWithDrawer() {
-    const [open, setOpen] = React.useState(false);
-
-    const handleDrawerOpen = () => {
-        setOpen(true);
+    const handleOpenNavMenu = (event) => {
+        setAnchorElNav(event.currentTarget);
+    };
+    const handleOpenUserMenu = (event) => {
+        setAnchorElUser(event.currentTarget);
     };
 
-    const handleDrawerClose = () => {
-        setOpen(false);
+    const handleCloseNavMenu = (e) => {
+        setAnchorElNav(null);
+        navigate(e.target.name);
     };
+
+    const handleCloseUserMenu = () => {
+        setAnchorElUser(null);
+    };
+
+    const list = [
+        {
+            text:'Requisitions',
+            route:'/requisition',
+        },
+    ]
+
+    if(getLoggedInUser().userTypeId===2) {
+        list.push(
+            {
+                text: 'Items',
+                route: '/items',
+            },
+        )
+    }
 
     return (
-        <>
-            <AppBar position="fixed" open={open} >
-                <Toolbar sx={{display:'flex', justifyContent:'space-between',alignItems:'center'}}>
-                    <div style={{display:'flex',alignItems:'center'}}>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={handleDrawerOpen}
-                        edge="start"
+        <AppBar position="fixed">
+            <Container maxWidth="xl">
+                <Toolbar disableGutters>
+                    <Typography
+                        variant="h6"
+                        noWrap
                         sx={{
-                            marginRight: 5,
-                            ...(open && { display: 'none' }),
+                            mr: 2,
+                            display: { xs: 'none', md: 'flex' },
+                            fontFamily: 'monospace',
+                            fontWeight: 700,
+                            letterSpacing: '.3rem',
+                            textDecoration: 'none',
                         }}
                     >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" noWrap component="span">
                         Inventory System
                     </Typography>
-                    </div>
-                    <div style={{display:'flex',alignItems:'center',gap:10}}>
-                    <Typography  variant="h6" noWrap component="span">{getLoggedInUser().username}</Typography>
-                        <BasicPopover
-                            content={<IconButton  ><ArrowDropDownIcon  sx={{ color: 'white' }}/></IconButton>}
+
+                    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+                        <IconButton
+                            size="large"
+                            aria-label="account of current user"
+                            aria-controls="menu-appbar"
+                            aria-haspopup="true"
+                            onClick={handleOpenNavMenu}
+                            color="inherit"
                         >
-                            <div>
-                                <div>
-                                    Change Password
-                                </div>
-                                <hr/>
-                                <div>
-                                    Logout
-                                </div>
-                            </div>
-                        </BasicPopover>
-                    </div>
+                            <MenuIcon />
+                        </IconButton>
+                        <Menu
+                            id="menu-appbar"
+                            anchorEl={anchorElNav}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                            }}
+                            keepMounted
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'left',
+                            }}
+                            open={Boolean(anchorElNav)}
+                            onClose={handleCloseNavMenu}
+                            sx={{
+                                display: { xs: 'block', md: 'none' },
+                            }}
+                        >
+                            {pages.map((page) => (
+                                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                                    <Typography textAlign="center">{page}</Typography>
+                                </MenuItem>
+                            ))}
+                        </Menu>
+                    </Box>
+                    <Typography
+                        variant="h5"
+                        noWrap
+                        sx={{
+                            mr: 2,
+                            display: { xs: 'flex', md: 'none' },
+                            flexGrow: 1,
+                            fontFamily: 'monospace',
+                            fontWeight: 700,
+                            letterSpacing: '.3rem',
+                            color: 'inherit',
+                            textDecoration: 'none',
+                        }}
+                    >
+                        Inventory System
+                    </Typography>
+                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+                        {list.map((page) => (
+                            <Button
+                                key={page.text}
+                                name={page.route}
+                                onClick={handleCloseNavMenu}
+                                sx={{ my: 2, color: 'white', display: 'block' }}
+                            >
+                                {page.text}
+                            </Button>
+                        ))}
+                    </Box>
+
+                    <Box sx={{ flexGrow: 0 }}>
+                        <Tooltip title="Open settings">
+                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                <Avatar name={getLoggedInUser().username.toUpperCase()} color="#7A7B83" size="50" round={true}  />
+                            </IconButton>
+                        </Tooltip>
+                        <Menu
+                            sx={{ mt: '45px' }}
+                            id="menu-appbar"
+                            anchorEl={anchorElUser}
+                            anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            keepMounted
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            open={Boolean(anchorElUser)}
+                            onClose={handleCloseUserMenu}
+                        >
+                            {settings.map((setting) => (
+                                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                                    <Typography textAlign="center">{setting}</Typography>
+                                </MenuItem>
+                            ))}
+                        </Menu>
+                    </Box>
                 </Toolbar>
-            </AppBar>
-            <MiniDrawer open={open} setOpen={setOpen} handleDrawerOpen={handleDrawerOpen} handleDrawerClose={handleDrawerClose} list={list}/>
-        </>
+            </Container>
+        </AppBar>
     );
 }
+export default ResponsiveAppBar;

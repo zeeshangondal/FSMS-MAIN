@@ -8,9 +8,9 @@ function Requisition(props) {
         <>
             <div style={{paddingLeft: '1px',
                 width: '100%'}}>
-                <Container>
+                <>
                     <Requisitions />
-                </Container>
+                </>
             </div>
             <CssBaseline />
         </>

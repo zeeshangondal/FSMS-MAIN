@@ -1,11 +1,11 @@
 import './App.css';
 import Items from "../pages/Items/Items";
-import Requisitions from '../pages/Requisitions/Requisitions';
+import Requisitions from './requisition';
 
 import {
     createBrowserRouter,
     RouterProvider,
-    Route, Outlet,
+    Route, Outlet, Navigate,
 } from "react-router-dom";
 
 import {Box, createTheme, CssBaseline} from "@mui/material";
@@ -14,9 +14,10 @@ import {styled,ThemeProvider} from "@mui/material/styles";
 import Register from '../pages/Users/Register';
 import LogIn from '../pages/Users/LogIn';
 
-import StoreKeeperLogin from '../pages/Users/StoreKeeperLogIn';
 import AddRequisitionForm from "../pages/Requisitions/AddRequisitionForm";
 import StoreKeeperRequisitionForm from "../pages/Requisitions/StoreKeeper/StoreKeeperRequisitionForm";
+import Login from "./login";
+import {getLoggedInUser} from "../service/employeeService";
 
 const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
@@ -55,7 +56,9 @@ const router = createBrowserRouter([
                 <CssBaseline />
                 <AppBarWithDrawer />
                 <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-                    <DrawerHeader />
+                    {/*{getLoggedInUser() ?*/}
+                    {/*    <Navigate to='/requisition'/> :*/}
+                    {/*    <Navigate to='/login'/>}*/}
                     <Outlet/>
                 </Box>
             </Box>
@@ -64,17 +67,12 @@ const router = createBrowserRouter([
             {
                 path:'/register',
                 element:
-                <Register/>
+                    <Register/>
             },
             {
                 path:'/login',
                 element:
-                <LogIn/>
-            },
-            {
-                path:'/storeKeeperLogin',
-                element:
-                <StoreKeeperLogin/>
+                    <Login/>
             },
             {
                 path:'/items',

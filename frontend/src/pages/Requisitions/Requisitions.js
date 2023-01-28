@@ -7,6 +7,7 @@ import StoreKeeperRequisition from './StoreKeeper/StoreKeeperRequisitions'
 import RequisitionTabs from "./User/SimpleUserRequisitionTabs";
 import SimpleUserRequisitionTabs from "./User/SimpleUserRequisitionTabs";
 import ReportingOfficerRequisitionTabs from "./ReportingOfficer/ReportingOfficerRequisitionTabs";
+import StoreKeeperRequisitionTabs from "./StoreKeeper/StoreKeeperRequisitionTabs";
 
 export default function Requisitions() {
   const [loggedInUser, setLoggedInUser] = React.useState({})
@@ -30,7 +31,7 @@ export default function Requisitions() {
         return <ReportingOfficerRequisitionTabs />
       }
       case 2: {
-        return <StoreKeeperRequisition />
+        return <StoreKeeperRequisitionTabs />
       }
     }
   }
