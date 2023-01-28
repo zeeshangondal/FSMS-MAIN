@@ -1,5 +1,5 @@
 import Axios from "axios"
-import getAuthorization from "./headers";
+import {getAuthorization} from "./headers";
 
 
 const BaseURL = "http://localhost:3001/api/v1/"

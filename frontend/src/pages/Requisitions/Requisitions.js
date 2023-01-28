@@ -8,6 +8,7 @@ import RequisitionTabs from "./User/SimpleUserRequisitionTabs";
 import SimpleUserRequisitionTabs from "./User/SimpleUserRequisitionTabs";
 import ReportingOfficerRequisitionTabs from "./ReportingOfficer/ReportingOfficerRequisitionTabs";
 import StoreKeeperRequisitionTabs from "./StoreKeeper/StoreKeeperRequisitionTabs";
+import { getURL } from '../../service/headers';
 
 export default function Requisitions() {
   const [loggedInUser, setLoggedInUser] = React.useState({})
@@ -22,7 +23,10 @@ export default function Requisitions() {
 
 
   const getUserRequisition = () => {
-
+    if(loggedInUser==null){
+      window.location.href=getURL()+"login"
+      return
+    }
     switch (loggedInUser.userTypeId) {
       case 0: {
         return <SimpleUserRequisitionTabs />

@@ -1,8 +1,10 @@
 const { getLoggedInUser } = require("./employeeService")
 
-const getAuthorization = () => {
+export const getAuthorization = () => {
     return {
         authorization: "Bearer " + getLoggedInUser().token
     }
 }
-module.exports = getAuthorization
+export const getURL = () => {
+    return("http://localhost:3000/")
+}

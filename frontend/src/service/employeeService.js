@@ -1,4 +1,5 @@
 import Axios from "axios"
+import { getURL } from "./headers";
 
 const KEYS = {
     loggedIn: 'loggedInEmployee'
@@ -61,7 +62,7 @@ export const logInEmployee = async (employeeData, valid, invalid) => {
 
 export const logoutEmployee=()=>{
     localStorage.setItem(KEYS.loggedIn, null)
-    window.location.href="http://localhost:3000/login"
+    window.location.href=getURL()+"login"
 }
 
 

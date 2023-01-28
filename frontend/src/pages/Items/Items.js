@@ -32,6 +32,8 @@ import ArrowCircleDownIcon from '@mui/icons-material/ArrowCircleDown';
 import PopOver from "../../components/controls/PopOver";
 import BasicPopover from "../../components/controls/PopOver";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import { getLoggedInUser } from '../../service/employeeService';
+import { getURL } from '../../service/headers';
 
 const styles = {
     pageContent: {
@@ -62,7 +64,9 @@ const headCells = [
 ]
 
 export default function Items() {
-
+    if(getLoggedInUser()==null || getLoggedInUser().userTypeId!=2){
+        window.location.href=getURL()+"login"
+    }
     const classes = styles;
     const [recordForEdit, setRecordForEdit] = useState(null)
     const [records, setRecords] = useState([])

@@ -1,6 +1,6 @@
 import { getLoggedInUser } from "./employeeService";
 import Axios from "axios"
-import getAuthorization from "./headers";
+import {getAuthorization} from "./headers";
 
 
 
