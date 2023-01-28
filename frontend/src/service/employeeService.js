@@ -59,6 +59,10 @@ export const logInEmployee = async (employeeData, valid, invalid) => {
     }
 }
 
+export const logoutEmployee=()=>{
+    localStorage.setItem(KEYS.loggedIn, null)
+    window.location.href="http://localhost:3000/login"
+}
 
 
 

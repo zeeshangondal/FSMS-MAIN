@@ -12,8 +12,8 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-import {getLoggedInUser} from "../service/employeeService";
-import {useNavigate} from "react-router";
+import { getLoggedInUser, logoutEmployee } from "../service/employeeService";
+import { useNavigate } from "react-router";
 
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Change Password', 'Logout'];
@@ -35,18 +35,23 @@ function ResponsiveAppBar() {
         navigate(e.target.name);
     };
 
-    const handleCloseUserMenu = () => {
+    const handleCloseUserMenu = (e) => {
         setAnchorElUser(null);
+        const option = e.target.innerText
+        if (option == "Logout") {
+            logoutEmployee()
+        } else if (option == "Change Password") {
+
+        }
     };
 
     const list = [
         {
-            text:'Requisitions',
-            route:'/requisition',
+            text: 'Requisitions',
+            route: '/requisition',
         },
     ]
-
-    if(getLoggedInUser().userTypeId===2) {
+    if (getLoggedInUser() != null && getLoggedInUser().userTypeId === 2) {
         list.push(
             {
                 text: 'Items',
@@ -126,48 +131,51 @@ function ResponsiveAppBar() {
                     >
                         Inventory System
                     </Typography>
-                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                        {list.map((page) => (
-                            <Button
-                                key={page.text}
-                                name={page.route}
-                                onClick={handleCloseNavMenu}
-                                sx={{ my: 2, color: 'white', display: 'block' }}
-                            >
-                                {page.text}
-                            </Button>
-                        ))}
-                    </Box>
-
-                    <Box sx={{ flexGrow: 0 }}>
-                        <Tooltip title="Open settings">
-                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar name={getLoggedInUser().username.toUpperCase()} color="#7A7B83" size="50" round={true}  />
-                            </IconButton>
-                        </Tooltip>
-                        <Menu
-                            sx={{ mt: '45px' }}
-                            id="menu-appbar"
-                            anchorEl={anchorElUser}
-                            anchorOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
-                            open={Boolean(anchorElUser)}
-                            onClose={handleCloseUserMenu}
-                        >
-                            {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                    <Typography textAlign="center">{setting}</Typography>
-                                </MenuItem>
+                    {getLoggedInUser() != null ?
+                        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+                            {list.map((page) => (
+                                <Button
+                                    key={page.text}
+                                    name={page.route}
+                                    onClick={handleCloseNavMenu}
+                                    sx={{ my: 2, color: 'white', display: 'block' }}
+                                >
+                                    {page.text}
+                                </Button>
                             ))}
-                        </Menu>
-                    </Box>
+                        </Box>
+                        :""}
+                    {getLoggedInUser() != null ?
+                        <Box sx={{ flexGrow: 0 }}>
+                            <Tooltip title="Open settings">
+                                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                    <Avatar name={getLoggedInUser().username.toUpperCase()} color="#7A7B83" size="50" round={true} />
+                                </IconButton>
+                            </Tooltip>
+                            <Menu
+                                sx={{ mt: '45px' }}
+                                id="menu-appbar"
+                                anchorEl={anchorElUser}
+                                anchorOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                keepMounted
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                open={Boolean(anchorElUser)}
+                                onClose={handleCloseUserMenu}
+                            >
+                                {settings.map((setting) => (
+                                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                                        <Typography textAlign="center" value={setting}>{setting}</Typography>
+                                    </MenuItem>
+                                ))}
+                            </Menu>
+                        </Box>
+                        : ""}
                 </Toolbar>
             </Container>
         </AppBar>
